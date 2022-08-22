@@ -1,5 +1,5 @@
 {
-  "name": "vue-2042",
+  "name": "vue-2048",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "sass": "^1.50.0",
+    "sass-loader": "^12.6.0",
     "vue": "^3.2.13"
   },
   "devDependencies": {
