@@ -6,7 +6,18 @@
       </div>
     </div>
     <div class="board-container">
-      <div class="board-item val-2 position-0-0">2</div>
+      <div
+        v-for="board in renderBoards"
+        :key="board.id"
+        :class="{
+          'board-item': true,
+          [`val-${board.num}`]: true,
+          [`position-${board.row}-${board.col}`]: true,
+        }"
+      >
+        {{ board.num }}
+      </div>
+      <!-- <div class="board-item val-2 position-0-0">2</div>
       <div class="board-item val-4 position-0-1">4</div>
       <div class="board-item val-8 position-0-2">8</div>
       <div class="board-item val-16 position-0-3">16</div>
@@ -24,23 +35,27 @@
       <div class="board-item val-2 position-3-0">2</div>
       <div class="board-item val-4 position-3-1">4</div>
       <div class="board-item val-8 position-3-2">8</div>
-      <div class="board-item val-16 position-3-3">16</div>
+      <div class="board-item val-16 position-3-3">16</div> -->
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import random from "random";
+
+// hooks
+import useKeyDown from '../hooks/useKeyDown'
 
 // constant
 import { GAME_ROW_COUNT, GAME_COL_COUNT } from "../constant";
 
 //types
-import { GameStatus } from "../types/gameType";
+import { GameStatus, GameBoard } from "../types/gameType";
 
 // utils
 import { initGameStatus, createBoard } from "../utils/gameStatus";
+import { transferMoveUp } from '../utils/handlerMoveBoard';
 
 const gameStatus = ref<GameStatus>([]);
 gameStatus.value = initGameStatus();
@@ -60,6 +75,40 @@ for (let i = 0; i < 2; i++) {
 }
 
 console.log("gameStatus: ", gameStatus.value);
+
+const renderBoards = computed(() => {
+  const ret: GameBoard[] = [];
+
+  for (let row = 0; row < GAME_ROW_COUNT; row++) {
+    for (let col = 0; col < GAME_COL_COUNT; col++) {
+      const board = gameStatus.value[row][col];
+
+      if (board) {
+        ret.push(board);
+      }
+    }
+  }
+
+  return ret;
+})
+
+console.log('测试转换：', transferMoveUp(gameStatus.value));
+
+// 初始化键盘事件
+useKeyDown({
+  up: () => {
+    console.log('up: ')
+  },
+  left:  () => {
+    console.log('left: ')
+  },
+  right:  () => {
+    console.log('right: ')
+  },
+  down: () => {
+    console.log('bottom: ')
+  }
+})
 
 // createBoard(gameStatus.value);
 // for (let i = 0; i < 10; i++) {
@@ -131,8 +180,9 @@ function testRandom () {
       font-size: 35px;
       line-height: 100px;
       border-radius: 3px;
-      box-shadow: 0 30px 10px rgb(243 215 116 / 0%), inset 0 0 0 1px rgb(255 255 255 / 0%);
-      transition: .1s easy-in-out;
+      box-shadow: 0 30px 10px rgb(243 215 116 / 0%),
+        inset 0 0 0 1px rgb(255 255 255 / 0%);
+      transition: 0.1s easy-in-out;
       &.val-2 {
         background: #eee4da;
       }
