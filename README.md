@@ -1,4 +1,4 @@
-# vue-2048
+# vue3-2048
 
 ## Project setup
 ```
