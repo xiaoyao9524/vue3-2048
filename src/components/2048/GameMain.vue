@@ -60,8 +60,11 @@ import GameHeader from "./components/GameHeader.vue";
   }
 
   .game-container-wrapper {
-    margin-top: 40px;
+    margin: 40px auto 0;
+    /* margin-top: 40px; */
     padding: 12px;
+    width: 460px;
+    box-sizing: border-box;
     border-radius: 6px;
     background: #bbada0;
   }
@@ -82,6 +85,7 @@ import GameHeader from "./components/GameHeader.vue";
     .game-container-wrapper {
       margin-top: 20px;
       padding: 10px;
+      width: 355px;
     }
   }
 }

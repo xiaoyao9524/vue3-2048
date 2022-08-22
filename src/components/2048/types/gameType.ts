@@ -1,8 +1,8 @@
 
 export interface GameBoard {
-  id: number;
-  x: number;
-  y: number;
+  id: string;
+  row: number;
+  col: number;
   num: number;
 }
 
