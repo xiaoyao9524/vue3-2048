@@ -14,6 +14,7 @@
           [`val-${board.num}`]: true,
           [`position-${board.row}-${board.col}`]: true,
         }"
+        @click="test"
       >
         {{ board.num }}
       </div>
@@ -45,17 +46,17 @@ import { ref, computed } from "vue";
 import random from "random";
 
 // hooks
-import useKeyDown from '../hooks/useKeyDown'
+import useKeyDown from "../hooks/useKeyDown";
 
 // constant
 import { GAME_ROW_COUNT, GAME_COL_COUNT } from "../constant";
 
 //types
-import { GameStatus, GameBoard } from "../types/gameType";
+import { GameStatus, GameBoard, GameRow } from "../types/gameType";
 
 // utils
 import { initGameStatus, createBoard } from "../utils/gameStatus";
-import { transferMoveUp } from '../utils/handlerMoveBoard';
+import { getMoveUpStatus } from "../utils/handlerMoveBoard";
 
 const gameStatus = ref<GameStatus>([]);
 gameStatus.value = initGameStatus();
@@ -74,14 +75,29 @@ for (let i = 0; i < 2; i++) {
   gameStatus.value[row][col] = board;
 }
 
+// gameStatus.value[1][1] = {
+//   id: 'fksdlg',
+//   num: 4,
+//   row: 1,
+//   col: 1
+  
+// }
+
+// gameStatus.value[2][1] = {
+//   id: 'gsdger',
+//   num: 4,
+//   row: 2,
+//   col: 1
+// }
+
 console.log("gameStatus: ", gameStatus.value);
 
 // 将二维数组转化为普通数组
 const renderBoards = computed(() => {
   const ret: GameBoard[] = [];
 
-  for (let row = 0; row < GAME_ROW_COUNT; row++) {
-    for (let col = 0; col < GAME_COL_COUNT; col++) {
+  for (let row = 0; row < gameStatus.value.length; row++) {
+    for (let col = 0; col < gameStatus.value[row].length; col++) {
       const board = gameStatus.value[row][col];
 
       if (board) {
@@ -91,25 +107,42 @@ const renderBoards = computed(() => {
   }
 
   return ret;
-})
+});
 
-console.log('测试转换：', transferMoveUp(gameStatus.value));
+const test = () => {
+  console.log(gameStatus.value)
+}
+
+// console.log('测试转换：', getMoveUpStatus(gameStatus.value));
+
+const handlerMoveUp = () => {
+  const newGameStatus = getMoveUpStatus(gameStatus.value);
+  console.log("up: ", newGameStatus.gameStatus);
+  gameStatus.value = newGameStatus.gameStatus;
+
+  if (newGameStatus.gameStatus[GAME_ROW_COUNT]) {
+    console.log('有第五行')
+    setTimeout(() => {
+      const _newGameStatus = [...gameStatus.value].slice(0, gameStatus.value.length - 1);
+
+      gameStatus.value = _newGameStatus;
+    }, 100);
+  }
+};
 
 // 初始化键盘事件
 useKeyDown({
-  up: () => {
-    console.log('up: ')
+  up: handlerMoveUp,
+  left: () => {
+    console.log("left: ");
   },
-  left:  () => {
-    console.log('left: ')
-  },
-  right:  () => {
-    console.log('right: ')
+  right: () => {
+    console.log("right: ");
   },
   down: () => {
-    console.log('bottom: ')
-  }
-})
+    console.log("bottom: ");
+  },
+});
 
 // createBoard(gameStatus.value);
 // for (let i = 0; i < 10; i++) {
@@ -183,7 +216,8 @@ function testRandom () {
       border-radius: 3px;
       box-shadow: 0 30px 10px rgb(243 215 116 / 0%),
         inset 0 0 0 1px rgb(255 255 255 / 0%);
-      transition: 0.1s easy-in-out;
+      transform: translate(0, 0);
+      transition: 0.15s;
       &.val-2 {
         background: #eee4da;
       }

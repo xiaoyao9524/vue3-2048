@@ -11,8 +11,6 @@ function useKeyDown({ up, left, right, down }: KeyDownHandler) {
   const keyNowDown = ref(false);
 
   function handlerKeyDownFn(e: KeyboardEvent) {
-    console.log('keyNowDown: ', keyNowDown.value);
-    
     if (keyNowDown.value) {
       return;
     }
