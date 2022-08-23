@@ -76,6 +76,7 @@ for (let i = 0; i < 2; i++) {
 
 console.log("gameStatus: ", gameStatus.value);
 
+// 将二维数组转化为普通数组
 const renderBoards = computed(() => {
   const ret: GameBoard[] = [];
 
