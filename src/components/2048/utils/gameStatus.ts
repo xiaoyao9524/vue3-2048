@@ -65,7 +65,7 @@ export function findRandomEmptyBoard (gameStatus: GameStatus): EmptyPosition | n
   return emptyPositionList[randomIndex];
 }
 
-export function createBoard (gameStatus: GameStatus) {
+export function createNewBoard (gameStatus: GameStatus) {
   const emptyPosition = findRandomEmptyBoard(gameStatus);
 
   if (!emptyPosition) {

@@ -14,7 +14,7 @@
           [`val-${board.num}`]: true,
           [`position-${board.row}-${board.col}`]: true,
         }"
-        @click="test"
+        @click="test(board)"
       >
         {{ board.num }}
       </div>
@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, defineEmits } from "vue";
 import random from "random";
 
 // hooks
@@ -55,41 +55,156 @@ import { GAME_ROW_COUNT, GAME_COL_COUNT } from "../constant";
 import { GameStatus, GameBoard, GameRow } from "../types/gameType";
 
 // utils
-import { initGameStatus, createBoard } from "../utils/gameStatus";
+import { initGameStatus, createNewBoard } from "../utils/gameStatus";
 import { getMoveUpStatus } from "../utils/handlerMoveBoard";
+
+const emit = defineEmits<{
+  (e: "scoreChange", value: number): void;
+}>();
 
 const gameStatus = ref<GameStatus>([]);
 gameStatus.value = initGameStatus();
+/*
+gameStatus.value = [
+  [null, null, null, null],
+  [null, null, null, null],
+  [null, null, null, null],
+  [
+    {
+      id: "test1",
+      row: 3,
+      col: 0,
+      num: 2,
+    },
+    {
+      id: "test2",
+      row: 3,
+      col: 1,
+      num: 2,
+    },
+    {
+      id: "test3",
+      row: 3,
+      col: 2,
+      num: 4,
+    },
+    {
+      id: "test4",
+      row: 3,
+      col: 3,
+      num: 4,
+    },
+  ],
+];
+*/
+const score = ref(0);
 
-for (let i = 0; i < 2; i++) {
-  const newBoard = createBoard(gameStatus.value);
+const createNextInterval = 500;
+
+const deleteBoardInterval = 500;
+
+const createBoard = () => {
+  const newBoard = createNewBoard(gameStatus.value);
 
   if (!newBoard) {
-    break;
+    return;
   }
+
+  const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value))
 
   const { row, col, board } = newBoard;
 
   console.log(row, col);
 
-  gameStatus.value[row][col] = board;
+  newGameStatus[row][col] = board;
+
+  gameStatus.value = newGameStatus;
+};
+
+for (let i = 0; i < 2; i++) {
+  createBoard();
+}
+/*
+gameStatus.value[1][0] = {
+  id: 'fksdlg',
+  num: 4,
+  row: 1,
+  col: 0
+
 }
 
-// gameStatus.value[1][1] = {
-//   id: 'fksdlg',
-//   num: 4,
-//   row: 1,
-//   col: 1
-  
-// }
+gameStatus.value[2][0] = {
+  id: 'gsdger',
+  num: 4,
+  row: 2,
+  col: 0
+}
 
-// gameStatus.value[2][1] = {
-//   id: 'gsdger',
-//   num: 4,
-//   row: 2,
-//   col: 1
-// }
+gameStatus.value[1][1] = {
+  id: 'gdfg',
+  num: 2,
+  row: 1,
+  col: 1
+}
 
+gameStatus.value[2][1] = {
+  id: 'hdhnfg',
+  num: 4,
+  row: 2,
+  col: 1
+}
+
+gameStatus.value[1][2] = {
+  id: 'gdhergd',
+  num: 4,
+  row: 1,
+  col: 2
+}
+
+gameStatus.value[2][2] = {
+  id: 'etrgfd',
+  num: 2,
+  row: 2,
+  col: 2
+}
+
+gameStatus.value[3][2] = {
+  id: 'etrgfd',
+  num: 2,
+  row: 3,
+  col: 2
+}
+*/
+
+/*
+gameStatus.value[0][3] = {
+  id: 'etrgfd',
+  num: 4,
+  row: 0,
+  col: 3
+}
+
+gameStatus.value[1][3] = {
+  id: 'flksdjf',
+  num: 4,
+  row: 1,
+  col: 3
+}
+
+gameStatus.value[2][3] = {
+  id: 'ghodsg',
+  num: 2,
+  row: 2,
+  col: 3
+}
+
+gameStatus.value[3][3] = {
+  id: 'begrdf',
+  num: 2,
+  row: 3,
+  col: 3
+}
+*/
 console.log("gameStatus: ", gameStatus.value);
 
 // 将二维数组转化为普通数组
@@ -109,9 +224,12 @@ const renderBoards = computed(() => {
   return ret;
 });
 
-const test = () => {
-  console.log(gameStatus.value)
-}
+const test = (board: GameBoard) => {
+  const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value));
+  
+
+  gameStatus.value = newGameStatus;
+};
 
 // console.log('测试转换：', getMoveUpStatus(gameStatus.value));
 
@@ -120,13 +238,30 @@ const handlerMoveUp = () => {
   console.log("up: ", newGameStatus.gameStatus);
   gameStatus.value = newGameStatus.gameStatus;
 
-  if (newGameStatus.gameStatus[GAME_ROW_COUNT]) {
-    console.log('有第五行')
-    setTimeout(() => {
-      const _newGameStatus = [...gameStatus.value].slice(0, gameStatus.value.length - 1);
+  score.value += newGameStatus.score;
+  emit("scoreChange", score.value);
 
-      gameStatus.value = _newGameStatus;
-    }, 100);
+  if (newGameStatus.gameStatus[GAME_ROW_COUNT]) {
+    if (newGameStatus.isMove) {
+      setTimeout(() => {
+        const _newGameStatus = [...gameStatus.value].slice(
+          0,
+          gameStatus.value.length - 1
+        );
+
+        gameStatus.value = _newGameStatus;
+
+        setTimeout(() => {
+          createBoard();
+        }, createNextInterval);
+      }, deleteBoardInterval);
+    }
+  } else {
+    if (newGameStatus.isMove) {
+      setTimeout(() => {
+        createBoard();
+      }, createNextInterval);
+    }
   }
 };
 
@@ -214,10 +349,9 @@ function testRandom () {
       font-size: 35px;
       line-height: 100px;
       border-radius: 3px;
-      box-shadow: 0 30px 10px rgb(243 215 116 / 0%),
-        inset 0 0 0 1px rgb(255 255 255 / 0%);
+      box-shadow: 0 30px 10px rgb(243 215 116 / 0%), inset 0 0 0 1px rgb(255 255 255 / 0%);
       transform: translate(0, 0);
-      transition: 0.15s;
+      transition: 0.5s;
       &.val-2 {
         background: #eee4da;
       }

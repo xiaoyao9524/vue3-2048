@@ -1,16 +1,17 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 
 interface KeyDownHandler {
-  up: () => any;
-  left: () => any;
-  right: () => any;
-  down: () => any;
+  up: () => void;
+  left: () => void;
+  right: () => void;
+  down: () => void;
 }
 
 function useKeyDown({ up, left, right, down }: KeyDownHandler) {
   const keyNowDown = ref(false);
 
   function handlerKeyDownFn(e: KeyboardEvent) {
+    
     if (keyNowDown.value) {
       return;
     }
@@ -18,15 +19,19 @@ function useKeyDown({ up, left, right, down }: KeyDownHandler) {
     switch (e.code) {
       case 'ArrowUp':
         up();
+        e.preventDefault();
         break;
       case 'ArrowLeft':
         left();
+        e.preventDefault();
         break;
       case 'ArrowRight':
         right();
+        e.preventDefault();
         break;
       case 'ArrowDown':
         down();
+        e.preventDefault();
         break;
     }
   }

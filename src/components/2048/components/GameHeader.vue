@@ -4,7 +4,7 @@
     <div class="score-wrapper">
       <div class="score">
         <h3 class="label">score</h3>
-        <p class="value">24</p>
+        <p class="value">{{ props.score }}</p>
       </div>
       <div class="best">
         <h3 class="label">best</h3>
@@ -13,6 +13,13 @@
     </div>
   </header>
 </template>
+
+<script setup lang="ts">
+import { defineProps } from "vue";
+const props = defineProps<{
+  score: number;
+}>();
+</script>
 
 <style lang="scss" scoped>
 .head {
