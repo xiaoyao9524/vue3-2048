@@ -13,36 +13,18 @@
           'board-item': true,
           [`val-${board.num}`]: true,
           [`position-${board.row}-${board.col}`]: true,
+          [`key-${board.id}`]: true
         }"
         @click="test(board)"
       >
         {{ board.num }}
       </div>
-      <!-- <div class="board-item val-2 position-0-0">2</div>
-      <div class="board-item val-4 position-0-1">4</div>
-      <div class="board-item val-8 position-0-2">8</div>
-      <div class="board-item val-16 position-0-3">16</div>
-
-      <div class="board-item val-32 position-1-0">32</div>
-      <div class="board-item val-64 position-1-1">64</div>
-      <div class="board-item val-128 position-1-2">128</div>
-      <div class="board-item val-256 position-1-3">256</div>
-
-      <div class="board-item val-512 position-2-0">512</div>
-      <div class="board-item val-1024 position-2-1">1024</div>
-      <div class="board-item val-2048 position-2-2">2048</div>
-      <div class="board-item val-4096 position-2-3">4096</div>
-
-      <div class="board-item val-2 position-3-0">2</div>
-      <div class="board-item val-4 position-3-1">4</div>
-      <div class="board-item val-8 position-3-2">8</div>
-      <div class="board-item val-16 position-3-3">16</div> -->
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineEmits } from "vue";
+import { ref, computed, defineEmits, watch } from "vue";
 import random from "random";
 
 // hooks
@@ -114,10 +96,9 @@ const createBoard = () => {
 
   const { row, col, board } = newBoard;
 
-  console.log(row, col);
-
   newGameStatus[row][col] = board;
 
+  console.log('新增元素后修改状态...')
   gameStatus.value = newGameStatus;
 };
 
@@ -210,10 +191,11 @@ console.log("gameStatus: ", gameStatus.value);
 // 将二维数组转化为普通数组
 const renderBoards = computed(() => {
   const ret: GameBoard[] = [];
+  const _gameStatus = JSON.parse(JSON.stringify(gameStatus.value))
 
-  for (let row = 0; row < gameStatus.value.length; row++) {
-    for (let col = 0; col < gameStatus.value[row].length; col++) {
-      const board = gameStatus.value[row][col];
+  for (let row = 0; row < _gameStatus.length; row++) {
+    for (let col = 0; col < _gameStatus[row].length; col++) {
+      const board = _gameStatus[row][col];
 
       if (board) {
         ret.push(board);
@@ -223,6 +205,10 @@ const renderBoards = computed(() => {
 
   return ret;
 });
+
+watch(renderBoards, (newVal, oldVal) => {
+  console.log('watch: ', newVal, oldVal);
+})
 
 const test = (board: GameBoard) => {
   const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value));
@@ -236,6 +222,7 @@ const test = (board: GameBoard) => {
 const handlerMoveUp = () => {
   const newGameStatus = getMoveUpStatus(gameStatus.value);
   console.log("up: ", newGameStatus.gameStatus);
+  console.log('修改状态...')
   gameStatus.value = newGameStatus.gameStatus;
 
   score.value += newGameStatus.score;
@@ -249,6 +236,7 @@ const handlerMoveUp = () => {
           gameStatus.value.length - 1
         );
 
+        console.log('删除元素后修改状态...')
         gameStatus.value = _newGameStatus;
 
         setTimeout(() => {
@@ -350,7 +338,7 @@ function testRandom () {
       line-height: 100px;
       border-radius: 3px;
       box-shadow: 0 30px 10px rgb(243 215 116 / 0%), inset 0 0 0 1px rgb(255 255 255 / 0%);
-      transform: translate(0, 0);
+      transform: translate(0px, 0px);
       transition: 0.5s;
       &.val-2 {
         background: #eee4da;
@@ -413,20 +401,20 @@ function testRandom () {
       }
 
       &.position-0-0 {
-        transform: translate(0, 0);
+        transform: translate(0px, 0px);
       }
       &.position-0-1 {
-        transform: translate(112px, 0);
+        transform: translate(112px, 0px);
       }
       &.position-0-2 {
-        transform: translate(224px, 0);
+        transform: translate(224px, 0px);
       }
       &.position-0-3 {
-        transform: translate(336px, 0);
+        transform: translate(336px, 0px);
       }
 
       &.position-1-0 {
-        transform: translate(0, 112px);
+        transform: translate(0px, 112px);
       }
       &.position-1-1 {
         transform: translate(112px, 112px);
@@ -439,7 +427,7 @@ function testRandom () {
       }
 
       &.position-2-0 {
-        transform: translate(0, 224px);
+        transform: translate(0px, 224px);
       }
       &.position-2-1 {
         transform: translate(112px, 224px);
@@ -452,7 +440,7 @@ function testRandom () {
       }
 
       &.position-3-0 {
-        transform: translate(0, 336px);
+        transform: translate(0px, 336px);
       }
       &.position-3-1 {
         transform: translate(112px, 336px);
@@ -508,20 +496,20 @@ function testRandom () {
         }
 
         &.position-0-0 {
-          transform: translate(0, 0);
+          transform: translate(0px, 0px);
         }
         &.position-0-1 {
-          transform: translate(86px, 0);
+          transform: translate(86px, 0px);
         }
         &.position-0-2 {
-          transform: translate(172px, 0);
+          transform: translate(172px, 0px);
         }
         &.position-0-3 {
-          transform: translate(258px, 0);
+          transform: translate(258px, 0px);
         }
 
         &.position-1-0 {
-          transform: translate(0, 86px);
+          transform: translate(0px, 86px);
         }
         &.position-1-1 {
           transform: translate(86px, 86px);
@@ -534,7 +522,7 @@ function testRandom () {
         }
 
         &.position-2-0 {
-          transform: translate(0, 172px);
+          transform: translate(0px, 172px);
         }
         &.position-2-1 {
           transform: translate(86px, 172px);
@@ -547,7 +535,7 @@ function testRandom () {
         }
 
         &.position-3-0 {
-          transform: translate(0, 258px);
+          transform: translate(0px, 258px);
         }
         &.position-3-1 {
           transform: translate(86px, 258px);

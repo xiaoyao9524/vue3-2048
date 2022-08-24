@@ -18,6 +18,7 @@ function useKeyDown({ up, left, right, down }: KeyDownHandler) {
     keyNowDown.value = true;
     switch (e.code) {
       case 'ArrowUp':
+        console.log('up触发。。')
         up();
         e.preventDefault();
         break;
