@@ -17,7 +17,7 @@
         }"
         @click="test"
       >
-        <Transition name="board-fade">
+        <Transition name="board-fade" appear>
           <div v-if="board.num" class="board-inner">{{ board.num }}</div>
         </Transition>
       </div>
@@ -332,12 +332,15 @@ useKeyDown({
 }
 
 .board-fade-enter-active{
-  transition: 5s;
+  transition: .08s;
 }
 
-.board-fade-enter-from,
-.board-fade-leave-to {
-  transform: scale(0.8);
+.board-fade-enter-from{
+  transform: scale(0.6);
+}
+
+.board-fade-enter-to {
+  transform: scale(1);
 }
 
 @media only all and (max-width: 750px) {
