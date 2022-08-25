@@ -15,7 +15,7 @@
           [`position-${board.row}-${board.col}`]: true,
           [`key-${board.id}`]: true,
         }"
-        @click="test(board)"
+        @click="test"
       >
         <div class="board-inner">{{ board.num }}</div>
       </div>
@@ -25,7 +25,6 @@
 
 <script setup lang="ts">
 import { ref, computed, defineEmits, watch } from "vue";
-import random from "random";
 
 // hooks
 import useKeyDown from "../hooks/useKeyDown";
@@ -34,16 +33,14 @@ import useKeyDown from "../hooks/useKeyDown";
 import { GAME_ROW_COUNT, GAME_COL_COUNT } from "../constant";
 
 //types
-import { GameStatus, GameBoard, GameRow } from "../types/gameType";
+import { GameStatus, GameBoard } from "../types/gameType";
 
 // utils
 import {
   initGameStatus,
   createNewBoard,
-  findRandomEmptyBoard,
 } from "../utils/gameStatus";
 import { getMoveUpStatus } from "../utils/handlerMoveBoard";
-import createID from "../utils/createId";
 
 const emit = defineEmits<{
   (e: "scoreChange", value: number): void;
@@ -51,54 +48,15 @@ const emit = defineEmits<{
 
 const gameStatus = ref<GameStatus>([]);
 gameStatus.value = initGameStatus();
-/*
-gameStatus.value = [
-  [
-    null,
-    {
-      id: 1,
-      row: 0,
-      col: 1,
-      num: 2,
-    },
-    null,
-    null,
-  ],
-  [
-    null,
-    {
-      id: 2,
-      row: 1,
-      col: 1,
-      num: 4,
-    },
-    null,
-    null,
-  ],
-  [
-    null,
-    null,
-    {
-      id: 3,
-      row: 2,
-      col: 2,
-      num: 2,
-    },
-    null,
-  ],
-  [null, null, null, null],
-];
-*/
+
 const score = ref(0);
 
+// 移动完创建下一个元素的间隔
 const createNextInterval = 100;
-
+// 移动完删除元素的间隔
 const deleteBoardInterval = 100;
 
-const currentId = ref(3);
-
 const createBoard = () => {
-
   const newBoard = createNewBoard(gameStatus.value);
 
   if (!newBoard) {
@@ -116,71 +74,14 @@ const createBoard = () => {
 
 };
 
-// const createBoard = () => {
-//   const newBoard = {
-//     row: 2,
-//     col: 2,
-//     board: {
-//       id: currentId.value,
-//       row: 2,
-//       col: 2,
-//       num: 2,
-//     },
-//   };
-
-//   currentId.value++;
-
-//   if (!newBoard) {
-//     return;
-//   }
-
-//   // const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value))
-
-//   // const { row, col, board } = newBoard;
-//   console.log("新增元素后修改状态...");
-//   gameStatus.value[newBoard.row][newBoard.col] = newBoard.board;
-
-//   // newGameStatus[row][col] = board;
-
-//   // gameStatus.value = newGameStatus;
-// };
-
+// 创建初始元素
 for (let i = 0; i < 2; i++) {
   createBoard();
-/*
-  const newBoard = {
-    // row: emptyPosition.row,
-    // col: emptyPosition.col,
-    row: 2 + i,
-    col: 1,
-    board: {
-      id: 'test' + currentId.value,
-      // row: emptyPosition.row,
-      // col: emptyPosition.col,
-      row: 2 + i,
-      col: 1,
-      num: (i + 1) * 2
-    }
-  }
-
-  currentId.value++;
-
-  const { row, col, board } = newBoard;
-
-  // newGameStatus[row][col] = board;
-
-  console.log('新增元素后修改状态...')
-  // gameStatus.value = newGameStatus;
-  gameStatus.value[newBoard.row][newBoard.col] = newBoard.board;
-*/
 }
 
-console.log("gameStatus: ", gameStatus.value);
-
-// 将二维数组转化为普通数组
+// 将二维数组转化为一维
 const renderBoards = computed(() => {
   const ret: GameBoard[] = [];
-  // const _gameStatus = JSON.parse(JSON.stringify(gameStatus.value));
 
   for (let row = 0; row < gameStatus.value.length; row++) {
     for (let col = 0; col < gameStatus.value[row].length; col++) {
@@ -197,24 +98,13 @@ const renderBoards = computed(() => {
   return ret;
 });
 
-watch(renderBoards, (newVal, oldVal) => {
-  console.log("watch: ", newVal, oldVal);
-});
-
-const test = (board: GameBoard) => {
-  const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value));
-
-  gameStatus.value = newGameStatus;
+const test = () => {
+  // 
 };
-
-// console.log('测试转换：', getMoveUpStatus(gameStatus.value));
 
 const handlerMoveUp = () => {
   const newGameStatus = getMoveUpStatus(gameStatus.value);
 
-  console.log("up之前的状态: ", JSON.stringify(gameStatus.value));
-  console.log("up新数据: ", JSON.stringify(newGameStatus.gameStatus));
-  console.log("up后开始修改状态...");
   gameStatus.value = newGameStatus.gameStatus;
 
   score.value += newGameStatus.score;
@@ -228,7 +118,6 @@ const handlerMoveUp = () => {
           gameStatus.value.length - 1
         );
 
-        console.log("删除元素后修改状态...");
         gameStatus.value = _newGameStatus;
 
         setTimeout(() => {
@@ -258,29 +147,6 @@ useKeyDown({
     console.log("bottom: ");
   },
 });
-
-// createBoard(gameStatus.value);
-// for (let i = 0; i < 10; i++) {
-//   console.log(findRandomEmptyBoard(gameStatus.value));
-// }
-
-/*
-testRandom();
-function testRandom () {
-  const obj: any = {};
-
-  for (let i = 0; i < 100; i++) {
-    const num = random.int(0, 4);
-    if (obj[num]) {
-      obj[num]++;
-    } else {
-      obj[num] = 1;
-    }
-  }
-
-  console.log(obj);
-}
-*/
 </script>
 
 <style scoped lang="scss">

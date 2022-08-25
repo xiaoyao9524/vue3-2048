@@ -1,5 +1,3 @@
-import createID from './createId';
-
 import {
   GameStatus,
   GameRow,
@@ -42,12 +40,8 @@ export const getMoveUpStatus = (_gameStatus: GameStatus): NewGameStatusResult =>
       if (!board) {
         continue
       }
-      // console.log('move：', 'row: ',  r, 'col: ', c);
-
       for (let checkRowIndex = r - 1; checkRowIndex > -1; checkRowIndex--) {
-        // console.log('check：', 'row: ', checkRowIndex, 'col: ', c);
         const checkBoard = gameStatus[checkRowIndex][c];
-        // console.log('撞上的格子: ', checkBoard);
 
         // 上方没有其它格子
         if (!checkBoard && checkRowIndex === 0) {
@@ -69,15 +63,9 @@ export const getMoveUpStatus = (_gameStatus: GameStatus): NewGameStatusResult =>
             col: c
           }
           gameStatus[checkRowIndex][c] = newBoard;
-          // checkBoard.num = checkBoard.num * 2;
           score += checkBoard.num * 2;
           board.row = checkBoard.row;
-          // await new Promise((resolve) => {
-          //   setTimeout(() => {
-          //     //
-          //     resolve();
-          //   }, 500)
-          // })
+          
           delBoardRow.push(board, checkBoard);
           gameStatus[r][c] = null;
           isMove = true;
@@ -103,8 +91,6 @@ export const getMoveUpStatus = (_gameStatus: GameStatus): NewGameStatusResult =>
   if (delBoardRow.length) {
     gameStatus[GAME_COL_COUNT] = delBoardRow; 
   }
-
-  
 
   const newGameStatusResult = {
     gameStatus,

@@ -1,5 +1,4 @@
 import random from 'random';
-import createId from './createId';
 
 import {
   GAME_ROW_COUNT,
