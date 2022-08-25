@@ -17,7 +17,7 @@
         }"
         @click="test(board)"
       >
-        {{ board.num }}
+        <div class="board-inner">{{ board.num }}</div>
       </div>
     </div>
   </div>
@@ -51,12 +51,12 @@ const emit = defineEmits<{
 
 const gameStatus = ref<GameStatus>([]);
 gameStatus.value = initGameStatus();
-
+/*
 gameStatus.value = [
   [
     null,
     {
-      id: '1',
+      id: 1,
       row: 0,
       col: 1,
       num: 2,
@@ -67,7 +67,7 @@ gameStatus.value = [
   [
     null,
     {
-      id: '2',
+      id: 2,
       row: 1,
       col: 1,
       num: 4,
@@ -79,7 +79,7 @@ gameStatus.value = [
     null,
     null,
     {
-      id: '3',
+      id: 3,
       row: 2,
       col: 2,
       num: 2,
@@ -88,66 +88,66 @@ gameStatus.value = [
   ],
   [null, null, null, null],
 ];
-
+*/
 const score = ref(0);
 
-const createNextInterval = 500;
+const createNextInterval = 100;
 
-const deleteBoardInterval = 500;
+const deleteBoardInterval = 100;
 
 const currentId = ref(3);
 
-// const createBoard = () => {
-
-//   const newBoard = createNewBoard(gameStatus.value);
-
-//   if (!newBoard) {
-//     return;
-//   }
-
-//   const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value))
-
-//   const { row, col, board } = newBoard;
-
-//   newGameStatus[row][col] = board;
-
-//   console.log('新增元素后修改状态...')
-//   gameStatus.value = newGameStatus;
-
-// };
-
 const createBoard = () => {
-  const newBoard = {
-    row: 2,
-    col: 2,
-    board: {
-      id: "test" + currentId.value,
-      row: 2,
-      col: 2,
-      num: 2,
-    },
-  };
 
-  currentId.value++;
+  const newBoard = createNewBoard(gameStatus.value);
 
   if (!newBoard) {
     return;
   }
 
-  // const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value))
+  const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value))
 
-  // const { row, col, board } = newBoard;
-  console.log("新增元素后修改状态...");
-  gameStatus.value[newBoard.row][newBoard.col] = newBoard.board;
+  const { row, col, board } = newBoard;
 
-  // newGameStatus[row][col] = board;
+  newGameStatus[row][col] = board;
 
-  // gameStatus.value = newGameStatus;
+  console.log('新增元素后修改状态...')
+  gameStatus.value = newGameStatus;
+
 };
-/*
-for (let i = 0; i < 2; i++) {
-  // createBoard();
 
+// const createBoard = () => {
+//   const newBoard = {
+//     row: 2,
+//     col: 2,
+//     board: {
+//       id: currentId.value,
+//       row: 2,
+//       col: 2,
+//       num: 2,
+//     },
+//   };
+
+//   currentId.value++;
+
+//   if (!newBoard) {
+//     return;
+//   }
+
+//   // const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value))
+
+//   // const { row, col, board } = newBoard;
+//   console.log("新增元素后修改状态...");
+//   gameStatus.value[newBoard.row][newBoard.col] = newBoard.board;
+
+//   // newGameStatus[row][col] = board;
+
+//   // gameStatus.value = newGameStatus;
+// };
+
+for (let i = 0; i < 2; i++) {
+  createBoard();
+/*
   const newBoard = {
     // row: emptyPosition.row,
     // col: emptyPosition.col,
@@ -172,25 +172,26 @@ for (let i = 0; i < 2; i++) {
   console.log('新增元素后修改状态...')
   // gameStatus.value = newGameStatus;
   gameStatus.value[newBoard.row][newBoard.col] = newBoard.board;
-
-}
 */
+}
+
 console.log("gameStatus: ", gameStatus.value);
 
 // 将二维数组转化为普通数组
 const renderBoards = computed(() => {
   const ret: GameBoard[] = [];
-  const _gameStatus = JSON.parse(JSON.stringify(gameStatus.value));
+  // const _gameStatus = JSON.parse(JSON.stringify(gameStatus.value));
 
-  for (let row = 0; row < _gameStatus.length; row++) {
-    for (let col = 0; col < _gameStatus[row].length; col++) {
-      const board = _gameStatus[row][col];
+  for (let row = 0; row < gameStatus.value.length; row++) {
+    for (let col = 0; col < gameStatus.value[row].length; col++) {
+      const board = gameStatus.value[row][col];
 
       if (board) {
         ret.push(board);
       }
     }
   }
+  
   ret.sort((a, b) => Number(a.id) - Number(b.id));
 
   return ret;
@@ -321,74 +322,94 @@ function testRandom () {
       left: 0;
       top: 0;
       z-index: 5;
-      text-align: center;
-      font-weight: bold;
       width: 100px;
       height: 100px;
-      font-size: 35px;
-      line-height: 100px;
       border-radius: 3px;
       box-shadow: 0 30px 10px rgb(243 215 116 / 0%), inset 0 0 0 1px rgb(255 255 255 / 0%);
       transform: translate(0px, 0px);
-      transition: 0.5s;
-      &.val-2 {
-        background: #eee4da;
+      transition: 0.15s;
+      .board-inner {
+        text-align: center;
+        font-weight: bold;
+        font-size: 35px;
+        line-height: 100px;
       }
+      &.val-2,
       &.val-4 {
-        background: #eee1c9;
+        .board-inner {
+          background: #eee4da;
+        }
       }
       &.val-8 {
-        color: #f9f6f2;
-        background: #f3b27a;
+        .board-inner {
+          color: #f9f6f2;
+          background: #f3b27a;
+        }
       }
       &.val-16 {
-        color: #f9f6f2;
-        background: #f69664;
+        .board-inner {
+          color: #f9f6f2;
+          background: #f69664;
+        }
       }
       &.val-32 {
-        color: #f9f6f2;
-        background: #f77c5f;
+        .board-inner {
+          color: #f9f6f2;
+          background: #f77c5f;
+        }
       }
       &.val-64 {
-        color: #f9f6f2;
-        background: #f75f3b;
+        .board-inner {
+          color: #f9f6f2;
+          background: #f75f3b;
+        }
       }
       &.val-128 {
-        color: #f9f6f2;
-        background: #edd073;
-        box-shadow: 0 0 30px 10px rgb(243 215 116 / 24%),
-          inset 0 0 0 1px rgb(255 255 255 / 14%);
-        font-size: 45px;
+        .board-inner {
+          color: #f9f6f2;
+          background: #edd073;
+          box-shadow: 0 0 30px 10px rgb(243 215 116 / 24%),
+            inset 0 0 0 1px rgb(255 255 255 / 14%);
+          font-size: 45px;
+        }
       }
       &.val-256 {
-        color: #f9f6f2;
-        background: #edcc62;
-        box-shadow: 0 0 30px 10px rgb(243 215 116 / 32%),
-          inset 0 0 0 1px rgb(255 255 255 / 19%);
-        font-size: 45px;
+        .board-inner {
+          color: #f9f6f2;
+          background: #edcc62;
+          box-shadow: 0 0 30px 10px rgb(243 215 116 / 32%),
+            inset 0 0 0 1px rgb(255 255 255 / 19%);
+          font-size: 45px;
+        }
       }
       &.val-512 {
-        color: #f9f6f2;
-        background: #edc950;
-        box-shadow: 0 0 30px 10px rgb(243 215 116 / 40%),
-          inset 0 0 0 1px rgb(255 255 255 / 24%);
-        font-size: 45px;
+        .board-inner {
+          color: #f9f6f2;
+          background: #edc950;
+          box-shadow: 0 0 30px 10px rgb(243 215 116 / 40%),
+            inset 0 0 0 1px rgb(255 255 255 / 24%);
+          font-size: 45px;
+        }
       }
       &.val-1024 {
-        color: #f9f6f2;
-        background: #edc53f;
-        box-shadow: 0 0 30px 10px rgb(243 215 116 / 48%),
-          inset 0 0 0 1px rgb(255 255 255 / 29%);
-        font-size: 35px;
+        .board-inner {
+          color: #f9f6f2;
+          background: #edc53f;
+          box-shadow: 0 0 30px 10px rgb(243 215 116 / 48%),
+            inset 0 0 0 1px rgb(255 255 255 / 29%);
+          font-size: 35px;
+        }
       }
       &.val-2048,
       &.val-4096,
       &.val-8192 {
-        color: #f9f6f2;
-        background: #edc22e;
-        box-shadow: 0 0 30px 10px rgb(243 215 116 / 56%),
-          inset 0 0 0 1px rgb(255 255 255 / 33%);
-        font-size: 35px;
+        .board-inner {
+          color: #f9f6f2;
+          background: #edc22e;
+          box-shadow: 0 0 30px 10px rgb(243 215 116 / 56%),
+            inset 0 0 0 1px rgb(255 255 255 / 33%);
+          font-size: 35px;
+        }
       }
 
       &.position-0-0 {
@@ -467,23 +488,31 @@ function testRandom () {
       .board-item {
         width: $board-width;
         height: $board-width;
-        font-size: 35px;
-        line-height: $board-width;
         border-radius: 3px;
         background: #eee4da;
+        .board-inner {
+          font-size: 35px;
+          line-height: $board-width;
+        }
 
         &.val-128,
         &.val-256,
         &.val-512 {
-          font-size: 25px;
+          .board-inner {
+            font-size: 25px;
+          }
         }
         &.val-1024 {
-          font-size: 15px;
+          .board-inner {
+            font-size: 15px;
+          }
         }
         &.val-2048,
         &.val-4096,
         &.val-8192 {
-          font-size: 15px;
+          .board-inner {
+            font-size: 15px;
+          }
         }
 
         &.position-0-0 {

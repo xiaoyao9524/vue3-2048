@@ -65,18 +65,18 @@ export function findRandomEmptyBoard (gameStatus: GameStatus): EmptyPosition | n
   return emptyPositionList[randomIndex];
 }
 
-export function findRandomEmptyBoard2 (gameStatus: GameStatus): EmptyPosition | null {
-  const emptyPositionList = findEmptyBoardPositionList(gameStatus);
+export function getNextBoardId (gameStatus: GameStatus) {
+  let ids: number[] = [];
 
-  if (!emptyPositionList.length) {
-    return null;
-  } else if (emptyPositionList.length === 1) {
-    return emptyPositionList[0];
+  for (const row of gameStatus) {
+    for (const board of row) {
+      if (board) {
+        ids.push(board.id);
+      }
+    }
   }
 
-  const randomIndex = random.int(0, emptyPositionList.length - 1);
-
-  return emptyPositionList[randomIndex];
+  return ids.length ? Math.max(...ids) + 1 : 1;
 }
 
 export function createNewBoard (gameStatus: GameStatus) {
@@ -94,7 +94,7 @@ export function createNewBoard (gameStatus: GameStatus) {
   const randomNum = random.int(0, 10);
 
   const board: GameBoard = {
-    id: createId(),
+    id: getNextBoardId(gameStatus),
     row,
     col,
     num: randomNum < 10 ? 2 : 4

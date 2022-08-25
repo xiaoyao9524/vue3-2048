@@ -1,6 +1,6 @@
 
 export interface GameBoard {
-  id: string;
+  id: number;
   row: number;
   col: number;
   num: number;
