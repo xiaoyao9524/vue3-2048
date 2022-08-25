@@ -65,6 +65,20 @@ export function findRandomEmptyBoard (gameStatus: GameStatus): EmptyPosition | n
   return emptyPositionList[randomIndex];
 }
 
+export function findRandomEmptyBoard2 (gameStatus: GameStatus): EmptyPosition | null {
+  const emptyPositionList = findEmptyBoardPositionList(gameStatus);
+
+  if (!emptyPositionList.length) {
+    return null;
+  } else if (emptyPositionList.length === 1) {
+    return emptyPositionList[0];
+  }
+
+  const randomIndex = random.int(0, emptyPositionList.length - 1);
+
+  return emptyPositionList[randomIndex];
+}
+
 export function createNewBoard (gameStatus: GameStatus) {
   const emptyPosition = findRandomEmptyBoard(gameStatus);
 

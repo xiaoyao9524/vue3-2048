@@ -13,7 +13,7 @@
           'board-item': true,
           [`val-${board.num}`]: true,
           [`position-${board.row}-${board.col}`]: true,
-          [`key-${board.id}`]: true
+          [`key-${board.id}`]: true,
         }"
         @click="test(board)"
       >
@@ -37,8 +37,13 @@ import { GAME_ROW_COUNT, GAME_COL_COUNT } from "../constant";
 import { GameStatus, GameBoard, GameRow } from "../types/gameType";
 
 // utils
-import { initGameStatus, createNewBoard } from "../utils/gameStatus";
+import {
+  initGameStatus,
+  createNewBoard,
+  findRandomEmptyBoard,
+} from "../utils/gameStatus";
 import { getMoveUpStatus } from "../utils/handlerMoveBoard";
+import createID from "../utils/createId";
 
 const emit = defineEmits<{
   (e: "scoreChange", value: number): void;
@@ -46,144 +51,128 @@ const emit = defineEmits<{
 
 const gameStatus = ref<GameStatus>([]);
 gameStatus.value = initGameStatus();
-/*
+
 gameStatus.value = [
-  [null, null, null, null],
-  [null, null, null, null],
-  [null, null, null, null],
   [
+    null,
     {
-      id: "test1",
-      row: 3,
-      col: 0,
-      num: 2,
-    },
-    {
-      id: "test2",
-      row: 3,
+      id: '1',
+      row: 0,
       col: 1,
       num: 2,
     },
-    {
-      id: "test3",
-      row: 3,
-      col: 2,
-      num: 4,
-    },
-    {
-      id: "test4",
-      row: 3,
-      col: 3,
-      num: 4,
-    },
+    null,
+    null,
   ],
+  [
+    null,
+    {
+      id: '2',
+      row: 1,
+      col: 1,
+      num: 4,
+    },
+    null,
+    null,
+  ],
+  [
+    null,
+    null,
+    {
+      id: '3',
+      row: 2,
+      col: 2,
+      num: 2,
+    },
+    null,
+  ],
+  [null, null, null, null],
 ];
-*/
+
 const score = ref(0);
 
 const createNextInterval = 500;
 
 const deleteBoardInterval = 500;
 
+const currentId = ref(3);
+
+// const createBoard = () => {
+
+//   const newBoard = createNewBoard(gameStatus.value);
+
+//   if (!newBoard) {
+//     return;
+//   }
+
+//   const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value))
+
+//   const { row, col, board } = newBoard;
+
+//   newGameStatus[row][col] = board;
+
+//   console.log('新增元素后修改状态...')
+//   gameStatus.value = newGameStatus;
+
+// };
+
 const createBoard = () => {
-  const newBoard = createNewBoard(gameStatus.value);
+  const newBoard = {
+    row: 2,
+    col: 2,
+    board: {
+      id: "test" + currentId.value,
+      row: 2,
+      col: 2,
+      num: 2,
+    },
+  };
+
+  currentId.value++;
 
   if (!newBoard) {
     return;
   }
 
-  const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value))
+  // const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value))
+
+  // const { row, col, board } = newBoard;
+  console.log("新增元素后修改状态...");
+  gameStatus.value[newBoard.row][newBoard.col] = newBoard.board;
+
+  // newGameStatus[row][col] = board;
+
+  // gameStatus.value = newGameStatus;
+};
+/*
+for (let i = 0; i < 2; i++) {
+  // createBoard();
+
+  const newBoard = {
+    // row: emptyPosition.row,
+    // col: emptyPosition.col,
+    row: 2 + i,
+    col: 1,
+    board: {
+      id: 'test' + currentId.value,
+      // row: emptyPosition.row,
+      // col: emptyPosition.col,
+      row: 2 + i,
+      col: 1,
+      num: (i + 1) * 2
+    }
+  }
+
+  currentId.value++;
 
   const { row, col, board } = newBoard;
 
-  newGameStatus[row][col] = board;
+  // newGameStatus[row][col] = board;
 
   console.log('新增元素后修改状态...')
-  gameStatus.value = newGameStatus;
-};
+  // gameStatus.value = newGameStatus;
+  gameStatus.value[newBoard.row][newBoard.col] = newBoard.board;
 
-for (let i = 0; i < 2; i++) {
-  createBoard();
-}
-/*
-gameStatus.value[1][0] = {
-  id: 'fksdlg',
-  num: 4,
-  row: 1,
-  col: 0
-
-}
-
-gameStatus.value[2][0] = {
-  id: 'gsdger',
-  num: 4,
-  row: 2,
-  col: 0
-}
-
-gameStatus.value[1][1] = {
-  id: 'gdfg',
-  num: 2,
-  row: 1,
-  col: 1
-}
-
-gameStatus.value[2][1] = {
-  id: 'hdhnfg',
-  num: 4,
-  row: 2,
-  col: 1
-}
-
-gameStatus.value[1][2] = {
-  id: 'gdhergd',
-  num: 4,
-  row: 1,
-  col: 2
-}
-
-gameStatus.value[2][2] = {
-  id: 'etrgfd',
-  num: 2,
-  row: 2,
-  col: 2
-}
-
-gameStatus.value[3][2] = {
-  id: 'etrgfd',
-  num: 2,
-  row: 3,
-  col: 2
-}
-*/
-
-/*
-gameStatus.value[0][3] = {
-  id: 'etrgfd',
-  num: 4,
-  row: 0,
-  col: 3
-}
-
-gameStatus.value[1][3] = {
-  id: 'flksdjf',
-  num: 4,
-  row: 1,
-  col: 3
-}
-
-gameStatus.value[2][3] = {
-  id: 'ghodsg',
-  num: 2,
-  row: 2,
-  col: 3
-}
-
-gameStatus.value[3][3] = {
-  id: 'begrdf',
-  num: 2,
-  row: 3,
-  col: 3
 }
 */
 console.log("gameStatus: ", gameStatus.value);
@@ -191,7 +180,7 @@ console.log("gameStatus: ", gameStatus.value);
 // 将二维数组转化为普通数组
 const renderBoards = computed(() => {
   const ret: GameBoard[] = [];
-  const _gameStatus = JSON.parse(JSON.stringify(gameStatus.value))
+  const _gameStatus = JSON.parse(JSON.stringify(gameStatus.value));
 
   for (let row = 0; row < _gameStatus.length; row++) {
     for (let col = 0; col < _gameStatus[row].length; col++) {
@@ -202,17 +191,17 @@ const renderBoards = computed(() => {
       }
     }
   }
+  ret.sort((a, b) => Number(a.id) - Number(b.id));
 
   return ret;
 });
 
 watch(renderBoards, (newVal, oldVal) => {
-  console.log('watch: ', newVal, oldVal);
-})
+  console.log("watch: ", newVal, oldVal);
+});
 
 const test = (board: GameBoard) => {
   const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value));
-  
 
   gameStatus.value = newGameStatus;
 };
@@ -221,8 +210,10 @@ const test = (board: GameBoard) => {
 
 const handlerMoveUp = () => {
   const newGameStatus = getMoveUpStatus(gameStatus.value);
-  console.log("up: ", newGameStatus.gameStatus);
-  console.log('修改状态...')
+
+  console.log("up之前的状态: ", JSON.stringify(gameStatus.value));
+  console.log("up新数据: ", JSON.stringify(newGameStatus.gameStatus));
+  console.log("up后开始修改状态...");
   gameStatus.value = newGameStatus.gameStatus;
 
   score.value += newGameStatus.score;
@@ -236,7 +227,7 @@ const handlerMoveUp = () => {
           gameStatus.value.length - 1
         );
 
-        console.log('删除元素后修改状态...')
+        console.log("删除元素后修改状态...");
         gameStatus.value = _newGameStatus;
 
         setTimeout(() => {

@@ -33,14 +33,50 @@ export const getMoveUpStatus = (_gameStatus: GameStatus): NewGameStatusResult =>
   for (let r = 1; r < gameStatus.length; r++) {
     const row = gameStatus[r];
     for (let c = 0; c < row.length; c++) {
-      const board = gameStatus[r][c];
-      
+      const board = row[c];
+
       if (!board) {
         continue
       }
-      // console.log('move：', 'row: ',  r, 'col: ', c);
+      console.log('----- current-board -----: ', 'row: ', r, 'col: ', c);
 
-      for (let checkRowIndex = r - 1; checkRowIndex > -1; checkRowIndex--) {
+      // const checkBoardList = [];
+      // for (let checkRowIndex = r - 1; checkRowIndex >= 0; checkRowIndex--) {
+
+      //   const checkBoard = gameStatus[checkRowIndex][c];
+      //   checkBoardList.push(checkBoard);
+      //   if (checkBoard) {
+      //     console.log('check-board-position: ', 'row: ', checkRowIndex, 'col: ', c, 'key: ', checkBoard.id, 'num: ', board.num);
+      //   } else {
+      //     console.log('check-board-position: ', 'row: ', checkRowIndex, 'col: ', c, 'num: ', null);
+      //   }
+      // }
+
+      // console.log('check-board-list: ', checkBoardList);
+
+      // let rowIndex = board.row - 1;
+      // for (let _checkBoard of checkBoardList) {
+      //   console.log('checkRowIndex: ', rowIndex);
+      //   if (!_checkBoard && rowIndex === 0) {
+      //     console.log('检查到最上方');
+      //     gameStatus[board.row][board.col] = null;
+      //     board.row = rowIndex;
+      //     gameStatus[rowIndex][c] = board;
+      //   } else if (_checkBoard && _checkBoard.num !== board.num) {
+      //     console.log('撞上了不一样的数字')
+      //     if (board.row === rowIndex + 1) {
+      //       continue
+      //     }
+      //     isMove = true;
+      //     gameStatus[board.row][board.col] = null;
+      //     board.row = rowIndex + 1;
+      //     gameStatus[rowIndex + 1][c] = board;
+      //   }
+      //   rowIndex--;
+      // }
+
+
+      for (let checkRowIndex = r - 1; checkRowIndex >= 0; checkRowIndex--) {
         // console.log('check：', 'row: ', checkRowIndex, 'col: ', c);
         const checkBoard = gameStatus[checkRowIndex][c];
         // console.log('撞上的格子: ', checkBoard);
@@ -51,7 +87,7 @@ export const getMoveUpStatus = (_gameStatus: GameStatus): NewGameStatusResult =>
           board.row = checkRowIndex;
           gameStatus[r][c] = null;
           gameStatus[checkRowIndex][c] = board;
-          console.log(JSON.parse(JSON.stringify(gameStatus)));
+          // console.log('up后的status: ', JSON.parse(JSON.stringify(gameStatus)));
           isMove = true;
           // logGameStatus(gameStatus);
           break
@@ -65,15 +101,10 @@ export const getMoveUpStatus = (_gameStatus: GameStatus): NewGameStatusResult =>
             col: c
           }
           gameStatus[checkRowIndex][c] = newBoard;
-          // checkBoard.num = checkBoard.num * 2;
+
           score += checkBoard.num * 2;
           board.row = checkBoard.row;
-          // await new Promise((resolve) => {
-          //   setTimeout(() => {
-          //     //
-          //     resolve();
-          //   }, 500)
-          // })
+
           delBoardRow.push(board, checkBoard);
           gameStatus[r][c] = null;
           isMove = true;
@@ -86,9 +117,9 @@ export const getMoveUpStatus = (_gameStatus: GameStatus): NewGameStatusResult =>
             board.row = checkBoard.row + 1;
             isMove = true;
           }
-            gameStatus[r][c] = null;
-            gameStatus[checkRowIndex + 1][c] = board;
-          
+          gameStatus[r][c] = null;
+          gameStatus[checkRowIndex + 1][c] = board;
+
           // logGameStatus(gameStatus);
           break
         }
@@ -97,23 +128,70 @@ export const getMoveUpStatus = (_gameStatus: GameStatus): NewGameStatusResult =>
   }
 
   if (delBoardRow.length) {
-    gameStatus[GAME_COL_COUNT] = delBoardRow; 
+    gameStatus[GAME_COL_COUNT] = delBoardRow;
   }
 
-  
+  console.log('up后的status: ', JSON.parse(JSON.stringify(gameStatus)));
+  logGameStatus(gameStatus);
 
   const newGameStatusResult = {
     gameStatus,
     isMove,
     score
   }
-  
-  return newGameStatusResult;
+
+  return {
+    gameStatus: [
+      [
+        null,
+        {
+          "id": "1",
+          "row": 0,
+          "col": 1,
+          "num": 2
+        },
+        {
+          "id": "3",
+          "row": 0,
+          "col": 2,
+          "num": 2
+        },
+        null
+      ],
+      [
+        null,
+        {
+          "id": "2",
+          "row": 1,
+          "col": 1,
+          "num": 4
+        },
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    isMove: true,
+    score: 0
+  }
+
+  // return newGameStatusResult;
 }
 
 function logGameStatus(gameStatus: GameStatus) {
   const logArr = [];
-  for (const row of gameStatus ) {
+  for (const row of gameStatus) {
     const _row = [];
     for (const board of row) {
       if (!board) {
