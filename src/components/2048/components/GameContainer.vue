@@ -17,7 +17,9 @@
         }"
         @click="test"
       >
-        <div class="board-inner">{{ board.num }}</div>
+        <Transition name="board-fade">
+          <div v-if="board.num" class="board-inner">{{ board.num }}</div>
+        </Transition>
       </div>
     </div>
   </div>
@@ -36,10 +38,7 @@ import { GAME_ROW_COUNT, GAME_COL_COUNT } from "../constant";
 import { GameStatus, GameBoard } from "../types/gameType";
 
 // utils
-import {
-  initGameStatus,
-  createNewBoard,
-} from "../utils/gameStatus";
+import { initGameStatus, createNewBoard } from "../utils/gameStatus";
 import { getMoveUpStatus } from "../utils/handlerMoveBoard";
 
 const emit = defineEmits<{
@@ -63,15 +62,14 @@ const createBoard = () => {
     return;
   }
 
-  const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value))
+  const newGameStatus = JSON.parse(JSON.stringify(gameStatus.value));
 
   const { row, col, board } = newBoard;
 
   newGameStatus[row][col] = board;
 
-  console.log('新增元素后修改状态...')
+  console.log("新增元素后修改状态...");
   gameStatus.value = newGameStatus;
-
 };
 
 // 创建初始元素
@@ -92,14 +90,14 @@ const renderBoards = computed(() => {
       }
     }
   }
-  
+
   ret.sort((a, b) => Number(a.id) - Number(b.id));
 
   return ret;
 });
 
 const test = () => {
-  // 
+  //
 };
 
 const handlerMoveUp = () => {
@@ -333,6 +331,15 @@ useKeyDown({
   }
 }
 
+.board-fade-enter-active{
+  transition: 5s;
+}
+
+.board-fade-enter-from,
+.board-fade-leave-to {
+  transform: scale(0.8);
+}
+
 @media only all and (max-width: 750px) {
   $board-width: 76px;
   $board-margin: 10px;
@@ -355,7 +362,7 @@ useKeyDown({
         width: $board-width;
         height: $board-width;
         border-radius: 3px;
-        background: #eee4da;
+        /* background: #eee4da; */
         .board-inner {
           font-size: 35px;
           line-height: $board-width;
