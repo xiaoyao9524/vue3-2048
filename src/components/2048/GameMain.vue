@@ -1,6 +1,6 @@
 <template>
   <div class="game-main">
-    <game-header :score="score" />
+    <game-header :score="score" :bestScore="bestScore" />
     <section class="above-game">
       <div class="tips">
         <p class="tip-item">组合数字最终达到<strong>2048</strong>!!!</p>
@@ -11,21 +11,29 @@
     </section>
 
     <section class="game-container-wrapper">
-      <game-container @score-change="handlerScoreChange" />
+      <game-container
+        @score-change="handlerScoreChange"
+        @best-score-change="handlerBestScoreChange"
+      />
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
+import { ref } from "vue";
 import GameContainer from "./components/GameContainer.vue";
 import GameHeader from "./components/GameHeader.vue";
 
 const score = ref(0);
+const bestScore = ref(0);
 
 const handlerScoreChange = (newScore: number) => {
   score.value = newScore;
-}
+};
+
+const handlerBestScoreChange = (newBestScore: number) => {
+  bestScore.value = newBestScore;
+};
 
 // import useResize from "@/hooks/useResize";
 

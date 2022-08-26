@@ -8,7 +8,7 @@
       </div>
       <div class="best">
         <h3 class="label">best</h3>
-        <p class="value">48</p>
+        <p class="value">{{ props.bestScore }}</p>
       </div>
     </div>
   </header>
@@ -18,6 +18,7 @@
 import { defineProps } from "vue";
 const props = defineProps<{
   score: number;
+  bestScore: number;
 }>();
 </script>
 

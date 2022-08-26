@@ -32,7 +32,7 @@ import { ref, computed, defineEmits, watch } from "vue";
 import useKeyDown from "../hooks/useKeyDown";
 
 // constant
-import { GAME_ROW_COUNT, GAME_COL_COUNT } from "../constant";
+import { GAME_ROW_COUNT, GAME_COL_COUNT, GAME_2048_BEST_SCORE_LOCAL_SAVE_KEY } from "../constant";
 
 //types
 import { GameStatus, GameBoard } from "../types/gameType";
@@ -44,13 +44,18 @@ import type { NewGameStatusResult } from "../utils/handlerMoveBoard";
 import { getMoveUpStatus, getMoveRightStatus, getMoveDownStatus, getMoveLeftStatus } from "../utils/handlerMoveBoard";
 
 const emit = defineEmits<{
-  (e: "scoreChange", value: number): void;
+  (e: "scoreChange", score: number): void;
+  (e: 'bestScoreChange', bestScore: number): void;
 }>();
 
 const gameStatus = ref<GameStatus>([]);
 gameStatus.value = initGameStatus();
 
 const score = ref(0);
+const localBestScore = localStorage.getItem(GAME_2048_BEST_SCORE_LOCAL_SAVE_KEY);
+console.log('localBestScore: ', localBestScore)
+const bestScore = ref(localBestScore ? Number(localBestScore) : 0);
+emit('bestScoreChange', bestScore.value);
 
 // 移动完创建下一个元素的间隔
 const createNextInterval = 100;
@@ -119,6 +124,12 @@ const handlerAfterMovingUpdateStatus = (newGameStatus: NewGameStatusResult) => {
 
   score.value += newGameStatus.score;
   emit("scoreChange", score.value);
+
+  if (bestScore.value < score.value) {
+    bestScore.value = score.value;
+    localStorage.setItem(GAME_2048_BEST_SCORE_LOCAL_SAVE_KEY, `${score.value}`);
+    emit('bestScoreChange', bestScore.value);
+  }
 
   if (newGameStatus.gameStatus[GAME_ROW_COUNT]) {
     if (newGameStatus.isMove) {
