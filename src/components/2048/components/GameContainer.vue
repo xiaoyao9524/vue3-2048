@@ -41,7 +41,7 @@ import { GameStatus, GameBoard } from "../types/gameType";
 import { initGameStatus, createNewBoard } from "../utils/gameStatus";
 
 import type { NewGameStatusResult } from "../utils/handlerMoveBoard";
-import { getMoveUpStatus, getMoveRightStatus, getMoveDownStatus } from "../utils/handlerMoveBoard";
+import { getMoveUpStatus, getMoveRightStatus, getMoveDownStatus, getMoveLeftStatus } from "../utils/handlerMoveBoard";
 
 const emit = defineEmits<{
   (e: "scoreChange", value: number): void;
@@ -150,12 +150,16 @@ const handlerMoveRight = () => {
   handlerAfterMovingUpdateStatus(newGameStatus);
 }
 
+const handlerMoveLeft = () => {
+  const newGameStatus = getMoveLeftStatus(gameStatus.value);
+
+  handlerAfterMovingUpdateStatus(newGameStatus);
+}
+
 // 初始化键盘事件
 useKeyDown({
   up: handlerMoveUp,
-  left: () => {
-    console.log("left: ");
-  },
+  left: handlerMoveLeft,
   right: handlerMoveRight,
   down: handlerMoveDown,
 });

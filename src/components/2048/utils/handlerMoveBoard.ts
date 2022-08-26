@@ -205,7 +205,7 @@ export const getMoveDownStatus = (_gameStatus: GameStatus): NewGameStatusResult 
   const delBoardRow: GameRow = []; // 多添加一行来存储即将要删除的元素
   let isMove = false;
   let score = 0;
-  console.log('right...')
+  // console.log('right...')
 
   for (let r = 0; r < gameStatus.length; r++) {
     const row = gameStatus[r];
@@ -218,9 +218,9 @@ export const getMoveDownStatus = (_gameStatus: GameStatus): NewGameStatusResult 
         continue
       }
       
-      console.log('----- move -----: ', 'row:', r, 'col: ', c);
+      // console.log('----- move -----: ', 'row:', r, 'col: ', c);
       for (let checkColIndex = board.col + 1; checkColIndex < row.length; checkColIndex++) {
-        console.log('check: ', 'row: ', r, 'col: ', checkColIndex);
+        // console.log('check: ', 'row: ', r, 'col: ', checkColIndex);
         const checkBoard = gameStatus[r][checkColIndex];
 
         // 右侧没有其它格子
@@ -265,6 +265,90 @@ export const getMoveDownStatus = (_gameStatus: GameStatus): NewGameStatusResult 
         }
         
       }
+    }
+  }
+
+  if (delBoardRow.length) {
+    gameStatus[GAME_ROW_COUNT] = delBoardRow; 
+  }
+
+  const newGameStatusResult = {
+    gameStatus,
+    isMove,
+    score
+  }
+  
+  return newGameStatusResult;
+}
+
+export const getMoveLeftStatus = (_gameStatus: GameStatus): NewGameStatusResult => {
+  const gameStatus: GameStatus = JSON.parse(JSON.stringify(_gameStatus));
+  const delBoardRow: GameRow = []; // 多添加一行来存储即将要删除的元素
+  let isMove = false;
+  let score = 0;
+  // console.log('left...')
+
+  for (let r = 0; r < gameStatus.length; r++) {
+    const row = gameStatus[r];
+
+    for (let c = 1; c < row.length; c++) {
+      // console.log('----- move -----: ', 'row:', r, 'col: ', c);
+      const board = gameStatus[r][c];
+      
+      if (!board) {
+        continue
+      }
+      
+      // console.log('----- move -----: ', 'row:', r, 'col: ', c);
+      
+      for (let checkColIndex = board.col - 1; checkColIndex >= 0; checkColIndex--) {
+        // console.log('check: ', 'row: ', r, 'col: ', checkColIndex);
+        const checkBoard = gameStatus[r][checkColIndex];
+
+        
+        // 左侧没有其它格子
+        if (!checkBoard && checkColIndex === 0) {
+          // console.log('左侧没有其它格子')
+          board.col = checkColIndex;
+          gameStatus[r][c] = null;
+          gameStatus[r][checkColIndex] = board;
+          // console.log(JSON.parse(JSON.stringify(gameStatus)));
+          isMove = true;
+          // logGameStatus(gameStatus);
+          break
+        } else if (checkBoard !== null && checkBoard.num === board.num) {
+          // 撞上了一样的数字
+          const newBoard = createNewBoard(gameStatus, {
+            num: board.num * 2,
+            row: r,
+            col: checkColIndex
+          }) as NewBoardResult;
+
+          gameStatus[r][checkColIndex] = (newBoard.board);
+          score += checkBoard.num * 2;
+          board.col = checkBoard.col;
+          
+          delBoardRow.push(board, checkBoard);
+          gameStatus[r][c] = null;
+          isMove = true;
+          // logGameStatus(gameStatus);
+          break
+        } else if (checkBoard !== null && checkBoard.num !== board.num) {
+          // 撞上了不一样的数字
+          // console.log('撞上了不一样的数字')
+          if (board.col !== checkBoard.col + 1) {
+            board.col = checkBoard.col + 1;
+            isMove = true;
+          }
+            gameStatus[r][c] = null;
+            gameStatus[r][checkBoard.col + 1] = board;
+          
+          // logGameStatus(gameStatus);
+          break
+        }
+        
+      }
+      
     }
   }
 
