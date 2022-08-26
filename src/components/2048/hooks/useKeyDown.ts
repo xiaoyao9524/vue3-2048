@@ -7,18 +7,23 @@ interface KeyDownHandler {
   down: () => void;
 }
 
+
 function useKeyDown({ up, left, right, down }: KeyDownHandler) {
   const keyNowDown = ref(false);
+  const keyDownTimer = ref(-1);
 
   function handlerKeyDownFn(e: KeyboardEvent) {
-    
+
     if (keyNowDown.value) {
+      console.log('无效按键')
       return;
     }
+
     keyNowDown.value = true;
+    clearTimeout(keyDownTimer.value);
+
     switch (e.code) {
       case 'ArrowUp':
-        console.log('up触发。。')
         up();
         e.preventDefault();
         break;
@@ -37,8 +42,10 @@ function useKeyDown({ up, left, right, down }: KeyDownHandler) {
     }
   }
 
-  function handlerKeyUpFn () {
-    keyNowDown.value = false;
+  function handlerKeyUpFn() {
+    keyDownTimer.value = setTimeout(() => {
+      keyNowDown.value = false;
+    }, 200)
   }
 
   onMounted(() => {

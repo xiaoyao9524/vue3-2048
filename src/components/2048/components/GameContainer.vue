@@ -51,8 +51,9 @@ const gameStatus = ref<GameStatus>([]);
 gameStatus.value = initGameStatus();
 
 const score = ref(0);
+
+// 最高分
 const localBestScore = localStorage.getItem(GAME_2048_BEST_SCORE_LOCAL_SAVE_KEY);
-console.log('localBestScore: ', localBestScore)
 const bestScore = ref(localBestScore ? Number(localBestScore) : 0);
 emit('bestScoreChange', bestScore.value);
 
@@ -110,9 +111,13 @@ const checkGameOver = () => {
 // 游戏区内的块
 const innerGameContainerBoards = computed (() => {
   const ret: GameBoard[] = [];
+  console.log('gameStatus: ', gameStatus.value)
 
   for (let row = 0; row < GAME_ROW_COUNT; row++) {
     for (let col = 0; col < GAME_COL_COUNT; col++) {
+      if (!gameStatus.value[row]) {
+        break;
+      }
       const board = gameStatus.value[row][col];
 
       if (board) {
@@ -127,7 +132,6 @@ const innerGameContainerBoards = computed (() => {
 })
 
 watch(innerGameContainerBoards, (val) => {
-  console.log('游戏区内的块：', val.length);
   if (val.length >= GAME_ROW_COUNT * GAME_COL_COUNT) {
     checkGameOver();
   }

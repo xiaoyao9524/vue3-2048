@@ -37,6 +37,9 @@ export function findEmptyBoardPositionList(gameStatus: GameStatus) {
 
   for (let r = 0; r < GAME_ROW_COUNT; r++) {
     for (let c = 0; c < GAME_COL_COUNT; c++) {
+      if (!gameStatus[r]) {
+        break;
+      }
       const board = gameStatus[r][c];
       if (!board) {
         ret.push({
