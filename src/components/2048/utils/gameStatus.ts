@@ -11,7 +11,7 @@ import {
   GameStatus
 } from '../types/gameType';
 
-export function initGameStatus (): GameStatus {
+export function initGameStatus(): GameStatus {
   const gameStatus: GameStatus = [];
 
   for (let r = 0; r < GAME_ROW_COUNT; r++) {
@@ -32,7 +32,7 @@ interface EmptyPosition {
   row: number;
   col: number;
 }
-export function findEmptyBoardPositionList (gameStatus: GameStatus) {
+export function findEmptyBoardPositionList(gameStatus: GameStatus) {
   const ret: EmptyPosition[] = [];
 
   for (let r = 0; r < GAME_ROW_COUNT; r++) {
@@ -50,7 +50,7 @@ export function findEmptyBoardPositionList (gameStatus: GameStatus) {
 }
 
 // 获取一个随机的空白块位置
-export function findRandomEmptyBoard (gameStatus: GameStatus): EmptyPosition | null {
+export function findRandomEmptyBoard(gameStatus: GameStatus): EmptyPosition | null {
   const emptyPositionList = findEmptyBoardPositionList(gameStatus);
 
   if (!emptyPositionList.length) {
@@ -64,7 +64,7 @@ export function findRandomEmptyBoard (gameStatus: GameStatus): EmptyPosition | n
   return emptyPositionList[randomIndex];
 }
 
-export function getNextBoardId (gameStatus: GameStatus) {
+export function getNextBoardId(gameStatus: GameStatus) {
   let ids: number[] = [];
 
   for (const row of gameStatus) {
@@ -78,25 +78,41 @@ export function getNextBoardId (gameStatus: GameStatus) {
   return ids.length ? Math.max(...ids) + 1 : 1;
 }
 
-export function createNewBoard (gameStatus: GameStatus) {
-  const emptyPosition = findRandomEmptyBoard(gameStatus);
+type BoardInfoPartial = Partial<GameBoard>;
+export interface NewBoardResult {
+  row: number;
+  col: number;
+  board: GameBoard;
+}
+export function createNewBoard(gameStatus: GameStatus, boardInfo: BoardInfoPartial = {}): false | NewBoardResult {
+  let emptyPosition = null;
 
-  if (!emptyPosition) {
-    return false
+  let id = boardInfo.id ? boardInfo.id : getNextBoardId(gameStatus);
+  let row = boardInfo.row;
+  let col = boardInfo.col;
+  let num = boardInfo.num ? boardInfo.num : (random.int(0, 10) < 10 ? 2 : 4);
+
+  if (row === undefined || col === undefined) {
+    emptyPosition = findRandomEmptyBoard(gameStatus);
+
+    if (!emptyPosition) {
+      return false;
+    }
+
+    if (row === undefined) {
+      row = emptyPosition.row;
+    }
+
+    if (col === undefined) {
+      col = emptyPosition.col;
+    }
   }
 
-  const {
-    row,
-    col
-  } = emptyPosition;
-
-  const randomNum = random.int(0, 10);
-
   const board: GameBoard = {
-    id: getNextBoardId(gameStatus),
+    id,
     row,
     col,
-    num: randomNum < 10 ? 2 : 4
+    num
   }
 
   return {

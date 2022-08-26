@@ -18,7 +18,7 @@
         @click="test"
       >
         <Transition name="board-fade" appear>
-          <div v-if="board.num" class="board-inner">{{ board.num }}</div>
+          <div class="board-inner">{{ board.num }}</div>
         </Transition>
       </div>
     </div>
@@ -39,7 +39,9 @@ import { GameStatus, GameBoard } from "../types/gameType";
 
 // utils
 import { initGameStatus, createNewBoard } from "../utils/gameStatus";
-import { getMoveUpStatus } from "../utils/handlerMoveBoard";
+
+import type { NewGameStatusResult } from "../utils/handlerMoveBoard";
+import { getMoveUpStatus, getMoveDownStatus } from "../utils/handlerMoveBoard";
 
 const emit = defineEmits<{
   (e: "scoreChange", value: number): void;
@@ -59,6 +61,7 @@ const createBoard = () => {
   const newBoard = createNewBoard(gameStatus.value);
 
   if (!newBoard) {
+    console.error('游戏结束！')
     return;
   }
 
@@ -68,7 +71,6 @@ const createBoard = () => {
 
   newGameStatus[row][col] = board;
 
-  console.log("新增元素后修改状态...");
   gameStatus.value = newGameStatus;
 };
 
@@ -103,6 +105,16 @@ const test = () => {
 const handlerMoveUp = () => {
   const newGameStatus = getMoveUpStatus(gameStatus.value);
 
+  handlerAfterMovingUpdateStatus(newGameStatus);
+};
+
+const handlerMoveDown = () => {
+  const newGameStatus = getMoveDownStatus(gameStatus.value);
+
+  handlerAfterMovingUpdateStatus(newGameStatus);
+};
+
+const handlerAfterMovingUpdateStatus = (newGameStatus: NewGameStatusResult) => {
   gameStatus.value = newGameStatus.gameStatus;
 
   score.value += newGameStatus.score;
@@ -141,9 +153,7 @@ useKeyDown({
   right: () => {
     console.log("right: ");
   },
-  down: () => {
-    console.log("bottom: ");
-  },
+  down: handlerMoveDown,
 });
 </script>
 
@@ -331,11 +341,11 @@ useKeyDown({
   }
 }
 
-.board-fade-enter-active{
-  transition: .08s;
+.board-fade-enter-active {
+  transition: 0.08s;
 }
 
-.board-fade-enter-from{
+.board-fade-enter-from {
   transform: scale(0.6);
 }
 
