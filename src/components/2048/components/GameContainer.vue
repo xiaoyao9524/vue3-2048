@@ -15,7 +15,6 @@
           [`position-${board.row}-${board.col}`]: true,
           [`key-${board.id}`]: true,
         }"
-        @click="test"
       >
         <Transition name="board-fade" appear>
           <div class="board-inner">{{ board.num }}</div>
@@ -103,9 +102,36 @@ const renderBoards = computed(() => {
   return ret;
 });
 
-const test = () => {
-  //
-};
+// 检查游戏是否结束
+const checkGameOver = () => {
+  console.log('检查游戏是否结束');
+}
+
+// 游戏区内的块
+const innerGameContainerBoards = computed (() => {
+  const ret: GameBoard[] = [];
+
+  for (let row = 0; row < GAME_ROW_COUNT; row++) {
+    for (let col = 0; col < GAME_COL_COUNT; col++) {
+      const board = gameStatus.value[row][col];
+
+      if (board) {
+        ret.push(board);
+      }
+    }
+  }
+
+  ret.sort((a, b) => Number(a.id) - Number(b.id));
+
+  return ret;
+})
+
+watch(innerGameContainerBoards, (val) => {
+  console.log('游戏区内的块：', val.length);
+  if (val.length >= GAME_ROW_COUNT * GAME_COL_COUNT) {
+    checkGameOver();
+  }
+})
 
 const handlerMoveUp = () => {
   const newGameStatus = getMoveUpStatus(gameStatus.value);
