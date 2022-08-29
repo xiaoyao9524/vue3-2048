@@ -37,7 +37,7 @@ import { GAME_ROW_COUNT, GAME_COL_COUNT, GAME_2048_BEST_SCORE_LOCAL_SAVE_KEY } f
 import { GameStatus, GameBoard } from "../types/gameType";
 
 // utils
-import { initGameStatus, createNewBoard } from "../utils/gameStatus";
+import { initGameStatus, createNewBoard, checkGameIsOver } from "../utils/gameStatus";
 
 import type { NewGameStatusResult } from "../utils/handlerMoveBoard";
 import { getMoveUpStatus, getMoveRightStatus, getMoveDownStatus, getMoveLeftStatus } from "../utils/handlerMoveBoard";
@@ -49,6 +49,89 @@ const emit = defineEmits<{
 
 const gameStatus = ref<GameStatus>([]);
 gameStatus.value = initGameStatus();
+
+
+gameStatus.value = [
+  [
+    {
+      id: 1,
+      num: 2,
+      row: 0,
+      col: 0
+    },
+    {
+      id: 2,
+      num: 4,
+      row: 0,
+      col: 1
+    },
+    {
+      id: 3,
+      num: 2,
+      row: 0,
+      col: 2
+    },
+    {
+      id: 4,
+      num: 4,
+      row: 0,
+      col: 3
+    },
+  ],
+  [
+    {
+      id: 5,
+      num: 4,
+      row: 1,
+      col: 0
+    },
+    {
+      id: 6,
+      num: 2,
+      row: 1,
+      col: 1
+    },
+    {
+      id: 7,
+      num: 4,
+      row: 1,
+      col: 2
+    },
+    {
+      id: 8,
+      num: 2,
+      row: 1,
+      col: 3
+    },
+  ],
+  [
+    {
+      id: 9,
+      num: 2,
+      row: 2,
+      col: 0
+    },
+    {
+      id: 10,
+      num: 4,
+      row: 2,
+      col: 1
+    },
+    {
+      id: 11,
+      num: 2,
+      row: 2,
+      col: 2
+    },
+    {
+      id: 12,
+      num: 4,
+      row: 2,
+      col: 3
+    },
+  ],
+  []
+]
 
 const score = ref(0);
 
@@ -79,6 +162,8 @@ const createBoard = () => {
   gameStatus.value = newGameStatus;
 };
 
+
+
 // 创建初始元素
 for (let i = 0; i < 2; i++) {
   createBoard();
@@ -106,12 +191,18 @@ const renderBoards = computed(() => {
 // 检查游戏是否结束
 const checkGameOver = () => {
   console.log('检查游戏是否结束');
+
+  const checkResult = checkGameIsOver(gameStatus.value);
+
+  if (checkResult) {
+    console.error('游戏结束！')
+  }
+
 }
 
 // 游戏区内的块
 const innerGameContainerBoards = computed (() => {
   const ret: GameBoard[] = [];
-  console.log('gameStatus: ', gameStatus.value)
 
   for (let row = 0; row < GAME_ROW_COUNT; row++) {
     for (let col = 0; col < GAME_COL_COUNT; col++) {

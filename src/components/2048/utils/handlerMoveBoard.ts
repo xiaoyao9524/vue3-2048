@@ -191,15 +191,6 @@ export const getMoveDownStatus = (_gameStatus: GameStatus): NewGameStatusResult 
   return newGameStatusResult;
 }
 
-/**
- * [
- *    [00, 01, 02, 03]
- *    [10, 11, 12, 13]
- *    [20, 21, 22, 23]
- *    [30, 31, 32, 33]
- * ]
- */
-
  export const getMoveRightStatus = (_gameStatus: GameStatus): NewGameStatusResult => {
   const gameStatus: GameStatus = JSON.parse(JSON.stringify(_gameStatus));
   const delBoardRow: GameRow = []; // 多添加一行来存储即将要删除的元素
