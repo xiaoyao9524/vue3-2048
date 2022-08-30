@@ -1,5 +1,5 @@
 <template>
-  <div ref="gameContainerEl" class="game-container">
+  <div ref="gameContainerEl" class="game-container" @touchstart="handlerTouchStart" @touchmove="handlerTouchMove">
     <div class="row-container">
       <div v-for="r in GAME_ROW_COUNT" :key="r" class="game-row">
         <div v-for="c in GAME_COL_COUNT" :key="c" class="game-board"></div>
@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineEmits, watch, defineExpose, onMounted, nextTick } from "vue";
+import { ref, computed, defineEmits, watch, defineExpose, onMounted, onUnmounted } from 'vue';
 
 // hooks
 import useKeyDown from "../hooks/useKeyDown";
@@ -39,7 +39,7 @@ import {
 } from "../constant";
 
 //types
-import { GameStatus, GameBoard } from "../types/gameType";
+import { GameStatus, GameBoard, GameDirection } from "../types/gameType";
 
 // utils
 import { initGameStatus, createNewBoard, checkGameIsOver } from "../utils/gameStatus";
@@ -238,8 +238,7 @@ watch(innerGameContainerBoards, (val) => {
   }
 });
 
-type Direction = "up" | "down" | "left" | "right";
-const handlerMove = (direction: Direction) => {
+const handlerMove = (direction: GameDirection) => {
   let newGameStatus: NewGameStatusResult | null = null;
 
   switch (direction) {
@@ -334,15 +333,18 @@ const eventHandler = {
   },
 };
 
+const {
+  handlerTouchStart,
+  handlerTouchMove,
+  handlerTouchEnd
+} = useTouch(eventHandler)
+
 // 初始化touch事件
 onMounted(() => {
-  nextTick(() => {
-    console.log('eee: ', gameContainerEl.value)
-    useTouch({
-      el: gameContainerEl.value as HTMLElement,
-      handler: eventHandler,
-    });
-  });
+  document.addEventListener('touchend', handlerTouchEnd);
+});
+onUnmounted(() => {
+  document.removeEventListener('touchend', handlerTouchEnd);
 });
 
 // 初始化键盘事件

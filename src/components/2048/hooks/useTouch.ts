@@ -1,4 +1,4 @@
-import { ref, reactive, nextTick, onMounted, onUnmounted } from 'vue';
+import { reactive } from 'vue';
 import type {
   GameDirection
 } from '../types/gameType';
@@ -11,24 +11,13 @@ interface TouchHandler {
   down: () => void;
 }
 
-interface TouchProps {
-  el: HTMLElement;
-  handler: TouchHandler;
-}
-
-
-function useTouch(touch: TouchProps) {
-  const {
-    el,
-    handler
-  } = touch;
-
+function useTouch(touchHandler: TouchHandler) {
   const {
     up,
     down,
     left,
     right
-  } = handler;
+  } = touchHandler;
 
   const startPosition = reactive({
     x: 0,
@@ -67,6 +56,8 @@ function useTouch(touch: TouchProps) {
     const endX = endPosition.x;
     const endY = endPosition.y;
 
+    console.log(startX, startY, endX, endY)
+
     if ([startX, startY, endX, endY].includes(0)) {
       return
     }
@@ -99,17 +90,29 @@ function useTouch(touch: TouchProps) {
         right();
         break;
     }
+
+    startPosition.x = 0;
+    startPosition.y = 0;
+
+    endPosition.x = 0;
+    endPosition.y = 0;
   }
 
-  el.addEventListener('touchstart', handlerTouchStart);
-  el.addEventListener('touchmove', handlerTouchMove);
-  document.addEventListener('touchend', handlerTouchEnd);
+  // el.addEventListener('touchstart', handlerTouchStart);
+  // el.addEventListener('touchmove', handlerTouchMove);
+  // document.addEventListener('touchend', handlerTouchEnd);
 
-  onUnmounted(() => {
-    el.removeEventListener('touchstart', handlerTouchStart);
-    el.addEventListener('touchmove', handlerTouchMove);
-    document.removeEventListener('touchend', handlerTouchEnd);
-  });
+  // onUnmounted(() => {
+  //   el.removeEventListener('touchstart', handlerTouchStart);
+  //   el.addEventListener('touchmove', handlerTouchMove);
+  //   document.removeEventListener('touchend', handlerTouchEnd);
+  // });
+
+  return {
+    handlerTouchStart,
+    handlerTouchMove,
+    handlerTouchEnd
+  }
 }
 
 export default useTouch;
