@@ -15,7 +15,6 @@ function useKeyDown({ up, left, right, down }: KeyDownHandler) {
   function handlerKeyDownFn(e: KeyboardEvent) {
 
     if (keyNowDown.value) {
-      console.log('无效按键')
       return;
     }
 

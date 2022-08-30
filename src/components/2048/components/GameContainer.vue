@@ -54,12 +54,13 @@ import {
 const emit = defineEmits<{
   (e: "scoreChange", score: number): void;
   (e: "bestScoreChange", bestScore: number): void;
-  (e: 'gameOver'): void;
+  (e: "gameOver"): void;
 }>();
 
 const gameStatus = ref<GameStatus>([]);
 gameStatus.value = initGameStatus();
 
+/*
 gameStatus.value = [
   [
     {
@@ -141,7 +142,7 @@ gameStatus.value = [
   ],
   [null, null, null, null],
 ];
-
+*/
 const score = ref(0);
 
 // 最高分
@@ -202,7 +203,7 @@ const checkGameOver = () => {
 
   if (checkResult) {
     isGameOver.value = true;
-    emit('gameOver');
+    emit("gameOver");
   }
 };
 
@@ -234,16 +235,31 @@ watch(innerGameContainerBoards, (val) => {
   }
 });
 
-const handlerMoveUp = () => {
-  const newGameStatus = getMoveUpStatus(gameStatus.value);
+type Direction = "up" | "down" | "left" | "right";
+const handlerMove = (direction: Direction) => {
+  let newGameStatus: NewGameStatusResult | null = null;
 
-  handlerAfterMovingUpdateStatus(newGameStatus);
-};
+  switch (direction) {
+    case "up":
+      newGameStatus = getMoveUpStatus(gameStatus.value);
+      break;
+    case "down":
+      newGameStatus = getMoveDownStatus(gameStatus.value);
+      break;
+    case "left":
+      newGameStatus = getMoveLeftStatus(gameStatus.value);
+      break;
+    case "right":
+      newGameStatus = getMoveRightStatus(gameStatus.value);
+      break;
+    default:
+      // newGameStatus = gameStatus.value;
+      return;
+  }
 
-const handlerMoveDown = () => {
-  const newGameStatus = getMoveDownStatus(gameStatus.value);
-
-  handlerAfterMovingUpdateStatus(newGameStatus);
+  if (newGameStatus) {
+    handlerAfterMovingUpdateStatus(newGameStatus);
+  }
 };
 
 const handlerAfterMovingUpdateStatus = (newGameStatus: NewGameStatusResult) => {
@@ -282,19 +298,7 @@ const handlerAfterMovingUpdateStatus = (newGameStatus: NewGameStatusResult) => {
   }
 };
 
-const handlerMoveRight = () => {
-  const newGameStatus = getMoveRightStatus(gameStatus.value);
-
-  handlerAfterMovingUpdateStatus(newGameStatus);
-};
-
-const handlerMoveLeft = () => {
-  const newGameStatus = getMoveLeftStatus(gameStatus.value);
-
-  handlerAfterMovingUpdateStatus(newGameStatus);
-};
-
-// 重新开始游戏
+// 开始新游戏
 const startNewGame = () => {
   score.value = 0;
   emit("scoreChange", 0);
@@ -314,10 +318,18 @@ defineExpose({
 
 // 初始化键盘事件
 useKeyDown({
-  up: handlerMoveUp,
-  left: handlerMoveLeft,
-  right: handlerMoveRight,
-  down: handlerMoveDown,
+  up: () => {
+    handlerMove("up");
+  },
+  left: () => {
+    handlerMove("left");
+  },
+  right: () => {
+    handlerMove("right");
+  },
+  down: () => {
+    handlerMove("down");
+  },
 });
 </script>
 
