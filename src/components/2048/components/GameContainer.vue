@@ -1,5 +1,5 @@
 <template>
-  <div class="game-container">
+  <div ref="gameContainerEl" class="game-container">
     <div class="row-container">
       <div v-for="r in GAME_ROW_COUNT" :key="r" class="game-row">
         <div v-for="c in GAME_COL_COUNT" :key="c" class="game-board"></div>
@@ -25,10 +25,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineEmits, watch, defineExpose } from "vue";
+import { ref, computed, defineEmits, watch, defineExpose, onMounted, nextTick } from "vue";
 
 // hooks
 import useKeyDown from "../hooks/useKeyDown";
+import useTouch from "../hooks/useTouch";
 
 // constant
 import {
@@ -56,6 +57,8 @@ const emit = defineEmits<{
   (e: "bestScoreChange", bestScore: number): void;
   (e: "gameOver"): void;
 }>();
+
+const gameContainerEl = ref<HTMLElement>();
 
 const gameStatus = ref<GameStatus>([]);
 gameStatus.value = initGameStatus();
@@ -316,8 +319,7 @@ defineExpose({
   startNewGame,
 });
 
-// 初始化键盘事件
-useKeyDown({
+const eventHandler = {
   up: () => {
     handlerMove("up");
   },
@@ -330,7 +332,21 @@ useKeyDown({
   down: () => {
     handlerMove("down");
   },
+};
+
+// 初始化touch事件
+onMounted(() => {
+  nextTick(() => {
+    console.log('eee: ', gameContainerEl.value)
+    useTouch({
+      el: gameContainerEl.value as HTMLElement,
+      handler: eventHandler,
+    });
+  });
 });
+
+// 初始化键盘事件
+useKeyDown(eventHandler);
 </script>
 
 <style scoped lang="scss">
