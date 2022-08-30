@@ -1,7 +1,6 @@
 import {
   GameStatus,
-  GameRow,
-  GameBoard
+  GameRow
 } from '../types/gameType';
 
 import {
@@ -10,7 +9,6 @@ import {
 } from '../constant'
 
 import {
-  getNextBoardId,
   createNewBoard
 } from './gameStatus';
 import type {
@@ -42,36 +40,18 @@ export const getMoveUpStatus = (_gameStatus: GameStatus): NewGameStatusResult =>
 
         // 上方没有其它格子
         if (!checkBoard && checkRowIndex === 0) {
-          // console.log('上方没有其它格子')
           board.row = checkRowIndex;
           gameStatus[r][c] = null;
           gameStatus[checkRowIndex][c] = board;
-          // console.log(JSON.parse(JSON.stringify(gameStatus)));
           isMove = true;
           // logGameStatus(gameStatus);
           break
         } else if (checkBoard !== null && checkBoard.num === board.num) {
-          // 撞上了一样的数字
-          // console.log('撞上了一样的数字')
-          // const newBoard: GameBoard = {
-          //   id: getNextBoardId(gameStatus),
-          //   num: board.num * 2,
-          //   row: checkRowIndex,
-          //   col: c
-          // }
           const newBoard = createNewBoard(gameStatus, {
             num: board.num * 2,
             row: checkRowIndex,
             col: c
           }) as NewBoardResult;
-
-          // if (!newBoard) {
-          //   return {
-          //     gameStatus,
-          //     isMove,
-          //     score
-          //   }
-          // }
 
           gameStatus[checkRowIndex][c] = (newBoard.board);
           score += checkBoard.num * 2;
@@ -84,7 +64,6 @@ export const getMoveUpStatus = (_gameStatus: GameStatus): NewGameStatusResult =>
           break
         } else if (checkBoard !== null && checkBoard.num !== board.num) {
           // 撞上了不一样的数字
-          // console.log('撞上了不一样的数字')
           if (board.row !== checkBoard.row + 1) {
             board.row = checkBoard.row + 1;
             isMove = true;
@@ -117,7 +96,6 @@ export const getMoveDownStatus = (_gameStatus: GameStatus): NewGameStatusResult 
   const delBoardRow: GameRow = []; // 多添加一行来存储即将要删除的元素
   let isMove = false;
   let score = 0;
-  // console.log('down...')
 
   for (let r = GAME_ROW_COUNT - 2; r >= 0; r--) {
     
@@ -128,19 +106,15 @@ export const getMoveDownStatus = (_gameStatus: GameStatus): NewGameStatusResult 
       if (!board) {
         continue
       }
-      // console.log('----- move -----: ', 'row:', r, 'col: ', c);
       
       for (let checkRowIndex = r + 1; checkRowIndex < gameStatus.length; checkRowIndex++) {
-        // console.log('check: ', 'row: ', checkRowIndex, 'col: ', c);
         const checkBoard = gameStatus[checkRowIndex][c];
 
         // 下方没有其它格子
         if (!checkBoard && checkRowIndex === GAME_ROW_COUNT - 1) {
-          // console.log('下方没有其它格子')
           board.row = checkRowIndex;
           gameStatus[r][c] = null;
           gameStatus[checkRowIndex][c] = board;
-          // console.log(JSON.parse(JSON.stringify(gameStatus)));
           isMove = true;
           // logGameStatus(gameStatus);
           break
@@ -163,7 +137,6 @@ export const getMoveDownStatus = (_gameStatus: GameStatus): NewGameStatusResult 
           break
         } else if (checkBoard !== null && checkBoard.num !== board.num) {
           // 撞上了不一样的数字
-          // console.log('撞上了不一样的数字')
           if (board.row !== checkBoard.row - 1) {
             board.row = checkBoard.row - 1;
             isMove = true;
@@ -196,31 +169,25 @@ export const getMoveDownStatus = (_gameStatus: GameStatus): NewGameStatusResult 
   const delBoardRow: GameRow = []; // 多添加一行来存储即将要删除的元素
   let isMove = false;
   let score = 0;
-  // console.log('right...')
 
   for (let r = 0; r < gameStatus.length; r++) {
     const row = gameStatus[r];
 
     for (let c = row.length - 2; c >= 0; c--) {
-      // console.log('----- move -----: ', 'row:', r, 'col: ', c);
       const board = gameStatus[r][c];
       
       if (!board) {
         continue
       }
       
-      // console.log('----- move -----: ', 'row:', r, 'col: ', c);
       for (let checkColIndex = board.col + 1; checkColIndex < row.length; checkColIndex++) {
-        // console.log('check: ', 'row: ', r, 'col: ', checkColIndex);
         const checkBoard = gameStatus[r][checkColIndex];
 
         // 右侧没有其它格子
         if (!checkBoard && checkColIndex === GAME_COL_COUNT - 1) {
-          // console.log('右侧没有其它格子')
           board.col = checkColIndex;
           gameStatus[r][c] = null;
           gameStatus[r][checkColIndex] = board;
-          // console.log(JSON.parse(JSON.stringify(gameStatus)));
           isMove = true;
           // logGameStatus(gameStatus);
           break
@@ -243,7 +210,6 @@ export const getMoveDownStatus = (_gameStatus: GameStatus): NewGameStatusResult 
           break
         } else if (checkBoard !== null && checkBoard.num !== board.num) {
           // 撞上了不一样的数字
-          // console.log('撞上了不一样的数字')
           if (board.col !== checkBoard.col - 1) {
             board.col = checkBoard.col - 1;
             isMove = true;
@@ -277,33 +243,26 @@ export const getMoveLeftStatus = (_gameStatus: GameStatus): NewGameStatusResult 
   const delBoardRow: GameRow = []; // 多添加一行来存储即将要删除的元素
   let isMove = false;
   let score = 0;
-  // console.log('left...')
 
   for (let r = 0; r < gameStatus.length; r++) {
     const row = gameStatus[r];
 
     for (let c = 1; c < row.length; c++) {
-      // console.log('----- move -----: ', 'row:', r, 'col: ', c);
       const board = gameStatus[r][c];
       
       if (!board) {
         continue
       }
       
-      // console.log('----- move -----: ', 'row:', r, 'col: ', c);
-      
       for (let checkColIndex = board.col - 1; checkColIndex >= 0; checkColIndex--) {
-        // console.log('check: ', 'row: ', r, 'col: ', checkColIndex);
         const checkBoard = gameStatus[r][checkColIndex];
 
         
         // 左侧没有其它格子
         if (!checkBoard && checkColIndex === 0) {
-          // console.log('左侧没有其它格子')
           board.col = checkColIndex;
           gameStatus[r][c] = null;
           gameStatus[r][checkColIndex] = board;
-          // console.log(JSON.parse(JSON.stringify(gameStatus)));
           isMove = true;
           // logGameStatus(gameStatus);
           break
@@ -326,7 +285,6 @@ export const getMoveLeftStatus = (_gameStatus: GameStatus): NewGameStatusResult 
           break
         } else if (checkBoard !== null && checkBoard.num !== board.num) {
           // 撞上了不一样的数字
-          // console.log('撞上了不一样的数字')
           if (board.col !== checkBoard.col + 1) {
             board.col = checkBoard.col + 1;
             isMove = true;
@@ -356,6 +314,7 @@ export const getMoveLeftStatus = (_gameStatus: GameStatus): NewGameStatusResult 
   return newGameStatusResult;
 }
 
+/*
 function logGameStatus(gameStatus: GameStatus) {
   const logArr = [];
   for (const row of gameStatus ) {
@@ -371,3 +330,4 @@ function logGameStatus(gameStatus: GameStatus) {
     console.log(_row);
   }
 }
+*/

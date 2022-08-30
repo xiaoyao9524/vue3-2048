@@ -7,14 +7,17 @@
         <a class="go-learn" href="javascript:void(0);">怎么玩？→</a>
       </div>
 
-      <a class="new-game-btn" href="javascript:;">新游戏</a>
+      <a class="new-game-btn" href="javascript:;" @click="startNewGame">新游戏</a>
     </section>
 
     <section class="game-container-wrapper">
       <game-container
-        @score-change="handlerScoreChange"
-        @best-score-change="handlerBestScoreChange"
+        ref="gameContainerRef"
+        @scoreChange="handlerScoreChange"
+        @bestScoreChange="handlerBestScoreChange"
+        @gameOver="handlerGameOver"
       />
+      <game-over ref="gameOverRef" @tryAgain="startNewGame" />
     </section>
   </div>
 </template>
@@ -23,6 +26,10 @@
 import { ref } from "vue";
 import GameContainer from "./components/GameContainer.vue";
 import GameHeader from "./components/GameHeader.vue";
+import GameOver from './components/GameOver.vue';
+
+const gameContainerRef = ref<InstanceType<typeof GameContainer> | null>(null);
+const gameOverRef = ref<InstanceType<typeof GameOver> | null>(null);
 
 const score = ref(0);
 const bestScore = ref(0);
@@ -38,6 +45,14 @@ const handlerBestScoreChange = (newBestScore: number) => {
 // import useResize from "@/hooks/useResize";
 
 // const innerWidth = useResize();
+
+const handlerGameOver = () => {
+  gameOverRef.value?.open();
+}
+
+const startNewGame = () => {
+  gameContainerRef.value?.startNewGame();
+}
 </script>
 
 <style lang="scss" scoped>
@@ -98,6 +113,7 @@ const handlerBestScoreChange = (newBestScore: number) => {
     }
 
     .game-container-wrapper {
+      position: relative;
       margin-top: 20px;
       padding: 10px;
       width: 355px;

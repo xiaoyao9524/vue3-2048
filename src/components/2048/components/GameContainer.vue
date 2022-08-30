@@ -25,13 +25,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineEmits, watch } from "vue";
+import { ref, computed, defineEmits, watch, defineExpose } from "vue";
 
 // hooks
 import useKeyDown from "../hooks/useKeyDown";
 
 // constant
-import { GAME_ROW_COUNT, GAME_COL_COUNT, GAME_2048_BEST_SCORE_LOCAL_SAVE_KEY } from "../constant";
+import {
+  GAME_ROW_COUNT,
+  GAME_COL_COUNT,
+  GAME_2048_BEST_SCORE_LOCAL_SAVE_KEY,
+} from "../constant";
 
 //types
 import { GameStatus, GameBoard } from "../types/gameType";
@@ -40,16 +44,21 @@ import { GameStatus, GameBoard } from "../types/gameType";
 import { initGameStatus, createNewBoard, checkGameIsOver } from "../utils/gameStatus";
 
 import type { NewGameStatusResult } from "../utils/handlerMoveBoard";
-import { getMoveUpStatus, getMoveRightStatus, getMoveDownStatus, getMoveLeftStatus } from "../utils/handlerMoveBoard";
+import {
+  getMoveUpStatus,
+  getMoveRightStatus,
+  getMoveDownStatus,
+  getMoveLeftStatus,
+} from "../utils/handlerMoveBoard";
 
 const emit = defineEmits<{
   (e: "scoreChange", score: number): void;
-  (e: 'bestScoreChange', bestScore: number): void;
+  (e: "bestScoreChange", bestScore: number): void;
+  (e: 'gameOver'): void;
 }>();
 
 const gameStatus = ref<GameStatus>([]);
 gameStatus.value = initGameStatus();
-
 
 gameStatus.value = [
   [
@@ -57,25 +66,25 @@ gameStatus.value = [
       id: 1,
       num: 2,
       row: 0,
-      col: 0
+      col: 0,
     },
     {
       id: 2,
       num: 4,
       row: 0,
-      col: 1
+      col: 1,
     },
     {
       id: 3,
       num: 2,
       row: 0,
-      col: 2
+      col: 2,
     },
     {
       id: 4,
       num: 4,
       row: 0,
-      col: 3
+      col: 3,
     },
   ],
   [
@@ -83,25 +92,25 @@ gameStatus.value = [
       id: 5,
       num: 4,
       row: 1,
-      col: 0
+      col: 0,
     },
     {
       id: 6,
       num: 2,
       row: 1,
-      col: 1
+      col: 1,
     },
     {
       id: 7,
       num: 4,
       row: 1,
-      col: 2
+      col: 2,
     },
     {
       id: 8,
       num: 2,
       row: 1,
-      col: 3
+      col: 3,
     },
   ],
   [
@@ -109,36 +118,38 @@ gameStatus.value = [
       id: 9,
       num: 2,
       row: 2,
-      col: 0
+      col: 0,
     },
     {
       id: 10,
       num: 4,
       row: 2,
-      col: 1
+      col: 1,
     },
     {
       id: 11,
       num: 2,
       row: 2,
-      col: 2
+      col: 2,
     },
     {
       id: 12,
       num: 4,
       row: 2,
-      col: 3
+      col: 3,
     },
   ],
-  []
-]
+  [null, null, null, null],
+];
 
 const score = ref(0);
 
 // 最高分
 const localBestScore = localStorage.getItem(GAME_2048_BEST_SCORE_LOCAL_SAVE_KEY);
 const bestScore = ref(localBestScore ? Number(localBestScore) : 0);
-emit('bestScoreChange', bestScore.value);
+emit("bestScoreChange", bestScore.value);
+
+const isGameOver = ref(false);
 
 // 移动完创建下一个元素的间隔
 const createNextInterval = 100;
@@ -149,7 +160,6 @@ const createBoard = () => {
   const newBoard = createNewBoard(gameStatus.value);
 
   if (!newBoard) {
-    console.error('游戏结束！')
     return;
   }
 
@@ -161,8 +171,6 @@ const createBoard = () => {
 
   gameStatus.value = newGameStatus;
 };
-
-
 
 // 创建初始元素
 for (let i = 0; i < 2; i++) {
@@ -190,18 +198,16 @@ const renderBoards = computed(() => {
 
 // 检查游戏是否结束
 const checkGameOver = () => {
-  console.log('检查游戏是否结束');
-
   const checkResult = checkGameIsOver(gameStatus.value);
 
   if (checkResult) {
-    console.error('游戏结束！')
+    isGameOver.value = true;
+    emit('gameOver');
   }
-
-}
+};
 
 // 游戏区内的块
-const innerGameContainerBoards = computed (() => {
+const innerGameContainerBoards = computed(() => {
   const ret: GameBoard[] = [];
 
   for (let row = 0; row < GAME_ROW_COUNT; row++) {
@@ -220,13 +226,13 @@ const innerGameContainerBoards = computed (() => {
   ret.sort((a, b) => Number(a.id) - Number(b.id));
 
   return ret;
-})
+});
 
 watch(innerGameContainerBoards, (val) => {
   if (val.length >= GAME_ROW_COUNT * GAME_COL_COUNT) {
     checkGameOver();
   }
-})
+});
 
 const handlerMoveUp = () => {
   const newGameStatus = getMoveUpStatus(gameStatus.value);
@@ -249,7 +255,7 @@ const handlerAfterMovingUpdateStatus = (newGameStatus: NewGameStatusResult) => {
   if (bestScore.value < score.value) {
     bestScore.value = score.value;
     localStorage.setItem(GAME_2048_BEST_SCORE_LOCAL_SAVE_KEY, `${score.value}`);
-    emit('bestScoreChange', bestScore.value);
+    emit("bestScoreChange", bestScore.value);
   }
 
   if (newGameStatus.gameStatus[GAME_ROW_COUNT]) {
@@ -280,13 +286,31 @@ const handlerMoveRight = () => {
   const newGameStatus = getMoveRightStatus(gameStatus.value);
 
   handlerAfterMovingUpdateStatus(newGameStatus);
-}
+};
 
 const handlerMoveLeft = () => {
   const newGameStatus = getMoveLeftStatus(gameStatus.value);
 
   handlerAfterMovingUpdateStatus(newGameStatus);
-}
+};
+
+// 重新开始游戏
+const startNewGame = () => {
+  score.value = 0;
+  emit("scoreChange", 0);
+
+  gameStatus.value = initGameStatus();
+
+  for (let i = 0; i < 2; i++) {
+    createBoard();
+  }
+
+  isGameOver.value = false;
+};
+
+defineExpose({
+  startNewGame,
+});
 
 // 初始化键盘事件
 useKeyDown({
